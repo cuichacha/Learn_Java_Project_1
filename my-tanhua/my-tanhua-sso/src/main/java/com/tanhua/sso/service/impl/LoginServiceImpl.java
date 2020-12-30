@@ -7,11 +7,18 @@ import com.tanhua.sso.mapper.UserMapper;
 import com.tanhua.sso.pojo.User;
 import com.tanhua.sso.pojo.UserInfo;
 import com.tanhua.sso.service.LoginService;
+import com.tanhua.sso.utils.TokenUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Service
 public class LoginServiceImpl implements LoginService {
@@ -25,21 +32,64 @@ public class LoginServiceImpl implements LoginService {
     @Autowired
     private UserInfoMapper userInfoMapper;
 
+    @Value("${jwt.secret}")
+    private String secret;
+
+    private Map<String, String> map = new LinkedHashMap<>();
+
     @Override
-    public void generateVerificationCode() {
-        String code = "123456";
-        redisTemplate.opsForValue().set("code", code, 60L, TimeUnit.SECONDS);
+    public void generateVerificationCode(String phone) {
+        // 使用正则表达式校验手机号
+        Pattern pattern = Pattern.compile("^[1]([3-9])[0-9]{9}$");
+        Matcher matcher = pattern.matcher(phone);
+        boolean matches = matcher.matches();
+        if (matches) {
+            String code = "123456";
+            String codeName = "sso_login_verificationCode_";
+            codeName = codeName + phone;
+            redisTemplate.opsForValue().set(codeName, code, 60L, TimeUnit.SECONDS);
+        }
     }
 
     @Override
-    public boolean verifyCode(String verificationCode) {
-        String code = redisTemplate.opsForValue().get("code");
+    public Map<String, String> verifyCode(String verificationCode, String phone) {
+        // 使用正则表达式校验验证码，包含非空判断
+        Pattern pattern = Pattern.compile("^[0-9]{6}$");
+        Matcher matcher = pattern.matcher(verificationCode);
+        boolean matches = matcher.matches();
+        if (!matches) {
+            return null;
+        }
+        String codeName = "sso_login_verificationCode_";
+        codeName = codeName + phone;
+        String code = redisTemplate.opsForValue().get(codeName);
         if (verificationCode.equals(code)) {
             // 验证码校验完成后需删除
-            redisTemplate.delete("code");
-            return true;
+            redisTemplate.delete(codeName);
+            // 判断是否新用户
+            boolean isNewUser = isNewUser(phone);
+
+            if (isNewUser) {
+                // 新用户，返回token, 返回Json字符串，要求填写资料，同时添加数据库信息
+                User newUser = new User();
+                newUser.setMobile(phone);
+                addUser(newUser);
+            }
+            // 老用户，返回token，返回Json字符串，继续业务
+            User user = findUserByPhone(phone);
+            Long uid = user.getId();
+            String id = String.valueOf(uid);
+            String mobile = user.getMobile();
+            String token = TokenUtil.generateToken(id, mobile, secret);
+            map.put("token", token);
+            if (isNewUser) {
+                map.put("isNew", "true");
+            } else {
+                map.put("isNew", "false");
+            }
+            return map;
         }
-        return false;
+        return null;
     }
 
     @Override
@@ -52,6 +102,16 @@ public class LoginServiceImpl implements LoginService {
             return user;
         }
         return null;
+    }
+
+    @Override
+    public boolean isNewUser(String phone) {
+        User user = findUserByPhone(phone);
+        if (user != null) {
+            return false;
+        } else {
+            return true;
+        }
     }
 
     @Override
