@@ -6,22 +6,13 @@ import com.tanhua.sso.pojo.User;
 import com.tanhua.sso.pojo.UserInfo;
 import com.tanhua.sso.service.LoginService;
 import com.tanhua.sso.vo.ErrorResult;
-import com.tanhua.sso.vo.Result;
-import io.jsonwebtoken.JwsHeader;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.sql.Date;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 @RestController
 @RequestMapping("/user")
@@ -44,19 +35,19 @@ public class LoginController {
         String phone = param.get("phone");
         String verificationCode = param.get("verificationCode");
 
-        Map<String, String> query = loginService.verifyCode(verificationCode, phone);
+        Map<String, Object> query = loginService.verifyCode(verificationCode, phone);
 
 //        Result result = new Result();
         ErrorResult errorResult = new ErrorResult();
 
         if (query == null) {
             errorResult.setErrCode("002");
-            errorResult.setErrMessage("验证码错误！");
+            errorResult.setErrMessage("sdfkjosdfkljsdfjkl！");
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResult);
         }
 
-        String result = JSON.toJSONString(query);
-        return ResponseEntity.ok(result);
+//        String result = JSON.toJSONString(query);
+        return ResponseEntity.ok(query);
     }
 
     @PostMapping("/loginReginfo/head")

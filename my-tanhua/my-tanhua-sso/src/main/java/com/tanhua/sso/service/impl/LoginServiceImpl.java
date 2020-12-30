@@ -2,6 +2,7 @@ package com.tanhua.sso.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.tanhua.sso.constant.RedisKey;
 import com.tanhua.sso.mapper.UserInfoMapper;
 import com.tanhua.sso.mapper.UserMapper;
 import com.tanhua.sso.pojo.User;
@@ -35,7 +36,7 @@ public class LoginServiceImpl implements LoginService {
     @Value("${jwt.secret}")
     private String secret;
 
-    private Map<String, String> map = new LinkedHashMap<>();
+    private Map<String, Object> map = new LinkedHashMap<>();
 
     @Override
     public void generateVerificationCode(String phone) {
@@ -45,14 +46,14 @@ public class LoginServiceImpl implements LoginService {
         boolean matches = matcher.matches();
         if (matches) {
             String code = "123456";
-            String codeName = "sso_login_verificationCode_";
-            codeName = codeName + phone;
+//            String codeName = "sso_login_verificationCode_";
+            String codeName = RedisKey.LOGIN + phone;
             redisTemplate.opsForValue().set(codeName, code, 60L, TimeUnit.SECONDS);
         }
     }
 
     @Override
-    public Map<String, String> verifyCode(String verificationCode, String phone) {
+    public Map<String, Object> verifyCode(String verificationCode, String phone) {
         // 使用正则表达式校验验证码，包含非空判断
         Pattern pattern = Pattern.compile("^[0-9]{6}$");
         Matcher matcher = pattern.matcher(verificationCode);
@@ -60,8 +61,8 @@ public class LoginServiceImpl implements LoginService {
         if (!matches) {
             return null;
         }
-        String codeName = "sso_login_verificationCode_";
-        codeName = codeName + phone;
+//        String codeName = "sso_login_verificationCode_";
+        String codeName = RedisKey.LOGIN + phone;
         String code = redisTemplate.opsForValue().get(codeName);
         if (verificationCode.equals(code)) {
             // 验证码校验完成后需删除
@@ -98,17 +99,24 @@ public class LoginServiceImpl implements LoginService {
         wrapper.eq("mobile", phone);
         User user = userMapper.selectOne(wrapper);
 //        User user = userMapper.findUserByPhone(phone);
-        if (user != null) {
-            return user;
-        }
-        return null;
+        return user;
+    }
+
+    @Override
+    public UserInfo findUserInfoByUserId(String userId) {
+        QueryWrapper<UserInfo> wrapper = new QueryWrapper<>();
+        wrapper.eq("user_id", userId);
+        return userInfoMapper.selectOne(wrapper);
     }
 
     @Override
     public boolean isNewUser(String phone) {
         User user = findUserByPhone(phone);
         if (user != null) {
-            return false;
+            Long uid = user.getId();
+            String id = String.valueOf(uid);
+            UserInfo userInfo = findUserInfoByUserId(id);
+            return userInfo == null;
         } else {
             return true;
         }
