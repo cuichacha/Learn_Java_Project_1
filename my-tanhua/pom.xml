@@ -6,6 +6,7 @@
     <packaging>pom</packaging>
     <modules>
         <module>my-tanhua-sso</module>
+        <module>my-tanhua-commons</module>
     </modules>
 
     <parent>
