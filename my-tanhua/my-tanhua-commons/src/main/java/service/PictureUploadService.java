@@ -1,4 +1,4 @@
-package com.tanhua.sso.service;
+package service;
 
 public interface PictureUploadService {
 }

@@ -1,27 +1,17 @@
 package com.tanhua.sso.controller;
 
-import com.alibaba.fastjson.JSON;
-import com.tanhua.sso.enums.SexEnum;
-import com.tanhua.sso.pojo.User;
-import com.tanhua.sso.pojo.UserInfo;
-import com.tanhua.sso.service.LoginService;
-import com.tanhua.sso.vo.ErrorResult;
-import com.tanhua.sso.vo.Result;
-import io.jsonwebtoken.JwsHeader;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+
+import enums.SexEnum;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import pojo.UserInfo;
+import service.LoginService;
+import vo.ErrorResult;
 
-import java.sql.Date;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 @RestController
 @RequestMapping("/user")

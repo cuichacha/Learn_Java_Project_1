@@ -4,16 +4,16 @@ import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.tanhua.sso.mapper.UserInfoMapper;
 import com.tanhua.sso.mapper.UserMapper;
-import com.tanhua.sso.pojo.User;
-import com.tanhua.sso.pojo.UserInfo;
-import com.tanhua.sso.service.LoginService;
-import com.tanhua.sso.utils.TokenUtil;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
+import pojo.User;
+import pojo.UserInfo;
+import service.LoginService;
+import utils.TokenUtil;
 
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;

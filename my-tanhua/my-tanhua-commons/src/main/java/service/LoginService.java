@@ -1,8 +1,8 @@
-package com.tanhua.sso.service;
+package service;
 
-import com.tanhua.sso.pojo.User;
-import com.tanhua.sso.pojo.UserInfo;
-import org.springframework.stereotype.Service;
+
+import pojo.User;
+import pojo.UserInfo;
 
 import java.util.Map;
 
