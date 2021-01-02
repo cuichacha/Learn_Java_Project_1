@@ -10,7 +10,7 @@ public interface LoginService {
 
     public abstract void generateVerificationCode(String phone);
 
-    public abstract Map<String, String> verifyCode(String verificationCode, String phone);
+    public abstract Map<String, Object> verifyCode(String verificationCode, String phone);
 
     public abstract User findUserByPhone(String phone);
 

@@ -44,7 +44,7 @@ public class LoginController {
         String phone = param.get("phone");
         String verificationCode = param.get("verificationCode");
 
-        Map<String, String> query = loginService.verifyCode(verificationCode, phone);
+        Map<String, Object> query = loginService.verifyCode(verificationCode, phone);
 
 //        Result result = new Result();
         ErrorResult errorResult = new ErrorResult();
@@ -55,8 +55,8 @@ public class LoginController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResult);
         }
 
-        String result = JSON.toJSONString(query);
-        return ResponseEntity.ok(result);
+//        String result = JSON.toJSONString(query);
+        return ResponseEntity.ok(query);
     }
 
     @PostMapping("/loginReginfo/head")

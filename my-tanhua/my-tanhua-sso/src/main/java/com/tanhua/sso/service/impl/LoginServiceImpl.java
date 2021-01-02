@@ -35,7 +35,7 @@ public class LoginServiceImpl implements LoginService {
     @Value("${jwt.secret}")
     private String secret;
 
-    private Map<String, String> map = new LinkedHashMap<>();
+    private Map<String, Object> map = new LinkedHashMap<>();
 
     @Override
     public void generateVerificationCode(String phone) {
@@ -52,7 +52,7 @@ public class LoginServiceImpl implements LoginService {
     }
 
     @Override
-    public Map<String, String> verifyCode(String verificationCode, String phone) {
+    public Map<String, Object> verifyCode(String verificationCode, String phone) {
         // 使用正则表达式校验验证码，包含非空判断
         Pattern pattern = Pattern.compile("^[0-9]{6}$");
         Matcher matcher = pattern.matcher(verificationCode);
@@ -83,9 +83,9 @@ public class LoginServiceImpl implements LoginService {
             String token = TokenUtil.generateToken(id, mobile, secret);
             map.put("token", token);
             if (isNewUser) {
-                map.put("isNew", "true");
+                map.put("isNew", Boolean.valueOf("true"));
             } else {
-                map.put("isNew", "false");
+                map.put("isNew", Boolean.valueOf("false"));
             }
             return map;
         }
