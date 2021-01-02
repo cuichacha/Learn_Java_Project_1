@@ -1,6 +1,7 @@
 package pojo;
 
-import com.tanhua.sso.enums.SexEnum;
+
+import enums.SexEnum;
 
 public class UserInfo extends BasePojo {
     private Long id;
