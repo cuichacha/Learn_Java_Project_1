@@ -1,4 +1,4 @@
-package enums;
+package com.tanhua.commons.enums;
 
 import com.baomidou.mybatisplus.core.enums.IEnum;
 

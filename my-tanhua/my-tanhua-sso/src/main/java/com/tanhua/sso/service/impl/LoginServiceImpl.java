@@ -1,7 +1,7 @@
 package com.tanhua.sso.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.tanhua.commons.constants.RedisKey;
 import com.tanhua.sso.mapper.UserInfoMapper;
 import com.tanhua.sso.mapper.UserMapper;
 
@@ -9,10 +9,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
-import pojo.User;
-import pojo.UserInfo;
-import service.LoginService;
-import utils.TokenUtil;
+import com.tanhua.commons.pojo.User;
+import com.tanhua.commons.pojo.UserInfo;
+import com.tanhua.commons.service.LoginService;
+import com.tanhua.commons.utils.TokenUtil;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -45,8 +45,8 @@ public class LoginServiceImpl implements LoginService {
         boolean matches = matcher.matches();
         if (matches) {
             String code = "123456";
-            String codeName = "sso_login_verificationCode_";
-            codeName = codeName + phone;
+//            String codeName = "sso_login_verificationCode_";
+            String codeName = RedisKey.LOGIN + phone;
             redisTemplate.opsForValue().set(codeName, code, 60L, TimeUnit.SECONDS);
         }
     }
@@ -60,8 +60,8 @@ public class LoginServiceImpl implements LoginService {
         if (!matches) {
             return null;
         }
-        String codeName = "sso_login_verificationCode_";
-        codeName = codeName + phone;
+//        String codeName = "sso_login_verificationCode_";
+        String codeName = RedisKey.LOGIN + phone;
         String code = redisTemplate.opsForValue().get(codeName);
         if (verificationCode.equals(code)) {
             // 验证码校验完成后需删除
@@ -80,6 +80,13 @@ public class LoginServiceImpl implements LoginService {
             Long uid = user.getId();
             String id = String.valueOf(uid);
             String mobile = user.getMobile();
+
+            // 将用户的id和手机号，缓存进Redis，防止token校验频繁查询数据库
+            String idCahce = RedisKey.ID_CACHE + id;
+            String phoneCache = RedisKey.PHONE_CACHE + phone;
+            redisTemplate.opsForValue().set(idCahce, id, 12L, TimeUnit.HOURS);
+            redisTemplate.opsForValue().set(phoneCache, phone, 12L, TimeUnit.HOURS);
+
             String token = TokenUtil.generateToken(id, mobile, secret);
             map.put("token", token);
             if (isNewUser) {
@@ -122,5 +129,10 @@ public class LoginServiceImpl implements LoginService {
     @Override
     public void addUserInfo(UserInfo userInfo) {
         userInfoMapper.insert(userInfo);
+    }
+
+    @Override
+    public void saveUserInfo(String Authorization, Map<String, String> param) {
+
     }
 }

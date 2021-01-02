@@ -1,4 +1,4 @@
-package pojo;
+package com.tanhua.commons.pojo;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 

@@ -1,5 +1,6 @@
-package utils;
+package com.tanhua.commons.utils;
 
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwsHeader;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -26,5 +27,10 @@ public class TokenUtil {
                 signWith(SignatureAlgorithm.HS256, secret)
                 .compact();
         return token;
+    }
+
+    public static Map<String, Object> parseToken(String token, String secret) {
+        Map<String, Object> body = Jwts.parser().setSigningKey(secret).parseClaimsJws(token).getBody();
+        return body;
     }
 }

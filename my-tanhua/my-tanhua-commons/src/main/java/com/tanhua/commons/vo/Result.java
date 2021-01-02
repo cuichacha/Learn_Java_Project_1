@@ -1,4 +1,4 @@
-package vo;
+package com.tanhua.commons.vo;
 
 public class Result {
     private String statusCode;

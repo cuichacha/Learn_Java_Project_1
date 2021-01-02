@@ -1,14 +1,14 @@
 package com.tanhua.sso.controller;
 
 
-import enums.SexEnum;
+import com.tanhua.commons.enums.SexEnum;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import pojo.UserInfo;
-import service.LoginService;
-import vo.ErrorResult;
+import com.tanhua.commons.pojo.UserInfo;
+import com.tanhua.commons.service.LoginService;
+import com.tanhua.commons.vo.ErrorResult;
 
 import java.util.Map;
 import java.util.UUID;
@@ -18,7 +18,6 @@ import java.util.UUID;
 public class LoginController {
     @Autowired
     private LoginService loginService;
-
 
     @PostMapping("/login")
 //    public void login(@RequestBody String parameter) {
@@ -47,11 +46,6 @@ public class LoginController {
 
 //        String result = JSON.toJSONString(query);
         return ResponseEntity.ok(query);
-    }
-
-    @PostMapping("/loginReginfo/head")
-    public void saveAvatar() {
-
     }
 
     // 获取前台传过来的用户信息，

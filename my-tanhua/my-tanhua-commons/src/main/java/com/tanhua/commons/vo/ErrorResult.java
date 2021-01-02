@@ -1,4 +1,4 @@
-package vo;
+package com.tanhua.commons.vo;
 
 public class ErrorResult {
     private String errCode;
