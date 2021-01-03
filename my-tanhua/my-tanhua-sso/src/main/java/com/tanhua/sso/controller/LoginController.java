@@ -50,10 +50,11 @@ public class LoginController {
 
     // 获取前台传过来的用户信息，
     @PostMapping("/loginReginfo")
-    public void saveUserInfo(@RequestHeader String Authorization, @RequestBody Map<String, String> param) {
+    public ResponseEntity<Object> saveUserInfo(@RequestHeader String Authorization, @RequestBody Map<String, String> param) {
 //        Map<String, String> param = JSON.parseObject(parameter, Map.class);
 
-        loginService.saveUserInfo(Authorization, param);
+        Boolean result = loginService.saveUserInfo(Authorization, param);
+        return null;
     }
 }
 

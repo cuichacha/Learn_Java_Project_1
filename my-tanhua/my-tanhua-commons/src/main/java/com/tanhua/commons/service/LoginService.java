@@ -3,6 +3,7 @@ package com.tanhua.commons.service;
 
 import com.tanhua.commons.pojo.User;
 import com.tanhua.commons.pojo.UserInfo;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -22,5 +23,5 @@ public interface LoginService {
 
     void addUserInfo(UserInfo userInfo);
 
-    public abstract void saveUserInfo(@RequestParam String Authorization, @RequestBody Map<String, String> param);
+    public abstract Boolean saveUserInfo(@RequestParam String Authorization, @RequestBody Map<String, String> param);
 }

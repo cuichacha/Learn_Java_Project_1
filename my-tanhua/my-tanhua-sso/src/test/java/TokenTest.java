@@ -19,4 +19,18 @@ public class TokenTest {
 //        System.out.println(map);
     }
 
+    @Test
+    public void test2() {
+        int[] nums = {1, 2, 3, 6};
+        for (int i = 0; i < nums.length; i++) {
+            int x = 9 - nums[i];
+            for (int j = i; j < nums.length; j++) {
+                if (nums[j] == x) {
+                    System.out.println(i);
+                    System.out.println(j);
+                }
+            }
+        }
+    }
+
 }

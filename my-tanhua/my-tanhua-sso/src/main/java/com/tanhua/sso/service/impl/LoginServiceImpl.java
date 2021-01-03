@@ -9,6 +9,7 @@ import com.tanhua.sso.mapper.UserMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import com.tanhua.commons.pojo.User;
 import com.tanhua.commons.pojo.UserInfo;
@@ -134,17 +135,21 @@ public class LoginServiceImpl implements LoginService {
     }
 
     @Override
-    public void saveUserInfo(String Authorization, Map<String, String> param) {
+    public Boolean saveUserInfo(String Authorization, Map<String, String> param) {
         // 先校验token
-        Map<String, Object> map = TokenUtil.parseToken(Authorization, secret);
-        String id = (String) map.get("id");
-        String mobile = (String) map.get("mobile");
+
+        if (TokenUtil.verifyToken(redisTemplate, Authorization, secret)) {
+            String gender = param.get("gender");
+            String nickname = param.get("nickname");
+            String birthday = param.get("birthday");
+            String city = param.get("city");
+            String header = param.get("header");
 
 
-        String gender = param.get("gender");
-        String nickname = param.get("nickname");
-        String birthday = param.get("birthday");
-        String city = param.get("city");
-        String header = param.get("header");
+        }
+
+        return false;
+
+
     }
 }
