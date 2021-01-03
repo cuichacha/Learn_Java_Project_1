@@ -1,5 +1,6 @@
 package com.tanhua.commons.utils;
 
+import com.tanhua.commons.constants.RedisKey;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwsHeader;
 import io.jsonwebtoken.Jwts;
@@ -39,12 +40,10 @@ public class TokenUtil {
         Map<String, Object> map = parseToken(token, secret);
         String id = (String) map.get("id");
         String mobile = (String) map.get("mobile");
-        String redisID = redisTemplate.opsForValue().get("id");
-        String redisMobile = redisTemplate.opsForValue().get("mobile");
-        if (id.equals(redisID) && mobile.equals(redisMobile)) {
-            return true;
-        } else {
-            return false;
-        }
+        String idCache = RedisKey.ID_CACHE + id;
+        String phoneCache = RedisKey.PHONE_CACHE + mobile;
+        String redisID = redisTemplate.opsForValue().get(idCache);
+        String redisMobile = redisTemplate.opsForValue().get(phoneCache);
+        return id.equals(redisID) && mobile.equals(redisMobile);
     }
 }

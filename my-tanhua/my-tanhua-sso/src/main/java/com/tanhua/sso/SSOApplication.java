@@ -7,7 +7,7 @@ import org.springframework.context.annotation.ComponentScan;
 
 @SpringBootApplication
 @MapperScan(basePackages = {"com.tanhua.sso.mapper"})
-@ComponentScan(basePackages = {"com.tanhua.sso", "com.tanhua.commons.config"})
+@ComponentScan(basePackages = {"com.tanhua.sso", "com.tanhua.commons.config", "com.tanhua.commons.interceptor"})
 public class SSOApplication {
     public static void main(String[] args) {
         SpringApplication.run(SSOApplication.class, args);

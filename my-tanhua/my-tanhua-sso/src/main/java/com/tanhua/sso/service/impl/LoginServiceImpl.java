@@ -89,9 +89,9 @@ public class LoginServiceImpl implements LoginService {
             String mobile = user.getMobile();
 
             // 将用户的id和手机号，缓存进Redis，防止token校验频繁查询数据库
-            String idCahce = RedisKey.ID_CACHE + id;
+            String idCache = RedisKey.ID_CACHE + id;
             String phoneCache = RedisKey.PHONE_CACHE + phone;
-            redisTemplate.opsForValue().set(idCahce, id, 12L, TimeUnit.HOURS);
+            redisTemplate.opsForValue().set(idCache, id, 12L, TimeUnit.HOURS);
             redisTemplate.opsForValue().set(phoneCache, phone, 12L, TimeUnit.HOURS);
 
             String token = TokenUtil.generateToken(id, mobile, secret);

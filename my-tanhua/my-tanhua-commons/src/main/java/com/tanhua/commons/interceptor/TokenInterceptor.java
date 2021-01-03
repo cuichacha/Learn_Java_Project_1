@@ -1,4 +1,4 @@
-package com.tanhua.sso.interceptor;
+package com.tanhua.commons.interceptor;
 
 import com.tanhua.commons.utils.TokenUtil;
 import org.springframework.beans.factory.annotation.Autowired;
