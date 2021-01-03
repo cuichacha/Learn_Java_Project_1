@@ -1,14 +1,18 @@
 package com.tanhua.sso.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.tanhua.commons.constants.RedisKey;
 import com.tanhua.commons.enums.SexEnum;
+import com.tanhua.commons.vo.ErrorResult;
 import com.tanhua.sso.mapper.UserInfoMapper;
 import com.tanhua.sso.mapper.UserMapper;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import com.tanhua.commons.pojo.User;
@@ -130,26 +134,51 @@ public class LoginServiceImpl implements LoginService {
     }
 
     @Override
+    public ResponseEntity<Object> addUserAvatar(String token, String avatarUrl) {
+        Map<String, Object> map = TokenUtil.parseToken(token, secret);
+        Object id = map.get("id");
+        UserInfo userInfo = new UserInfo();
+//        userInfo.setUserId(id);
+        userInfo.setLogo(avatarUrl);
+        userInfo.setCoverPic(avatarUrl);
+        QueryWrapper<UserInfo> wrapper = new QueryWrapper();
+        wrapper.eq("user_id", id);
+        int result = userInfoMapper.update(userInfo, wrapper);
+
+        if (result != 1) {
+            ErrorResult errorResult = new ErrorResult();
+            errorResult.setErrCode("005");
+            errorResult.setErrMessage("用户头像存入失败");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResult);
+        }
+
+        return ResponseEntity.ok(null);
+    }
+
+    @Override
     public void addUserInfo(UserInfo userInfo) {
         userInfoMapper.insert(userInfo);
     }
 
+
     @Override
     public Boolean saveUserInfo(String Authorization, Map<String, String> param) {
-        // 先校验token
+        // 先校验token，拦截器中已完成
 
-        if (TokenUtil.verifyToken(redisTemplate, Authorization, secret)) {
-            String gender = param.get("gender");
-            String nickname = param.get("nickname");
-            String birthday = param.get("birthday");
-            String city = param.get("city");
-            String header = param.get("header");
-
-
-        }
-
-        return false;
-
-
+        Map<String, Object> map = TokenUtil.parseToken(Authorization, secret);
+        String idStr = (String) map.get("id");
+        long id = Long.parseLong(idStr);
+        String gender = param.get("gender");
+        String nickname = param.get("nickname");
+        String birthday = param.get("birthday");
+        String city = param.get("city");
+        UserInfo userInfo = new UserInfo();
+        userInfo.setUserId(id);
+        userInfo.setSex(StringUtils.equalsIgnoreCase(gender, "man") ? SexEnum.MAN : SexEnum.WOMAN);
+        userInfo.setNickName(nickname);
+        userInfo.setBirthday(birthday);
+        userInfo.setCity(city);
+        int result = userInfoMapper.insert(userInfo);
+        return result == 1;
     }
 }

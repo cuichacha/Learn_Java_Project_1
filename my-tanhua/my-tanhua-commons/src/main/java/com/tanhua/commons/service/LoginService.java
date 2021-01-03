@@ -21,6 +21,8 @@ public interface LoginService {
 
     void addUser(User user);
 
+    public abstract ResponseEntity<Object> addUserAvatar(String token, String avatarUrl);
+
     void addUserInfo(UserInfo userInfo);
 
     public abstract Boolean saveUserInfo(@RequestParam String Authorization, @RequestBody Map<String, String> param);

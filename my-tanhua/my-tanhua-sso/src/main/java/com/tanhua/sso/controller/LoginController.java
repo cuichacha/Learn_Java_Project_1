@@ -54,7 +54,13 @@ public class LoginController {
 //        Map<String, String> param = JSON.parseObject(parameter, Map.class);
 
         Boolean result = loginService.saveUserInfo(Authorization, param);
-        return null;
+        if (result) {
+            return ResponseEntity.ok(null);
+        }
+        ErrorResult errorResult = new ErrorResult();
+        errorResult.setErrCode("005");
+        errorResult.setErrMessage("保存用户信息失败！");
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResult);
     }
 }
 

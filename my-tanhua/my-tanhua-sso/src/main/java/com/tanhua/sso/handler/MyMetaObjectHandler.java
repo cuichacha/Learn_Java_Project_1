@@ -1,4 +1,4 @@
-package com.tanhua.commons.handler;
+package com.tanhua.sso.handler;
 
 import com.baomidou.mybatisplus.core.handlers.MetaObjectHandler;
 import org.apache.ibatis.reflection.MetaObject;

@@ -1,11 +1,12 @@
 package com.tanhua.sso.service.impl;
 
 import com.aliyun.oss.OSSClient;
-//import com.tanhua.commons.config.AliyunConfig;
+import com.tanhua.commons.config.AliyunConfig;
+import com.tanhua.commons.service.LoginService;
 import com.tanhua.commons.service.PictureUploadService;
 import com.tanhua.commons.vo.PictureUploadResult;
 
-import com.tanhua.sso.config.AliyunConfig;
+//import com.tanhua.sso.config.AliyunConfig;
 import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
@@ -30,7 +31,7 @@ public class PictureUploadServiceImpl implements PictureUploadService {
             ".jpeg", ".gif", ".png"};
 
     @Override
-    public Boolean upload(MultipartFile multipartFile) {
+    public String upload(String token, MultipartFile multipartFile) {
 
         boolean isLegal = false;
 
@@ -43,18 +44,20 @@ public class PictureUploadServiceImpl implements PictureUploadService {
         }
 
         if (!isLegal) {
-            return false;
+            return null;
         }
 
+        String fileName = multipartFile.getOriginalFilename();
+        String filePath = getFilePath(fileName);
+
         try {
-            String fileName = multipartFile.getOriginalFilename();
-            String filePath = getFilePath(fileName);
             ossClient.putObject(aliyunConfig.getBucketName(), filePath, new ByteArrayInputStream(multipartFile.getBytes()));
         } catch (IOException e) {
             e.printStackTrace();
-            return false;
+            return null;
         }
-        return true;
+
+        return aliyunConfig.getPrefixUrl() + filePath;
     }
 
     private String getFilePath(String fileName) {
