@@ -2,6 +2,7 @@ package com.tanhua.sso.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.tanhua.commons.constants.RedisKey;
+import com.tanhua.commons.enums.SexEnum;
 import com.tanhua.sso.mapper.UserInfoMapper;
 import com.tanhua.sso.mapper.UserMapper;
 
@@ -16,6 +17,7 @@ import com.tanhua.commons.utils.TokenUtil;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -133,6 +135,16 @@ public class LoginServiceImpl implements LoginService {
 
     @Override
     public void saveUserInfo(String Authorization, Map<String, String> param) {
+        // 先校验token
+        Map<String, Object> map = TokenUtil.parseToken(Authorization, secret);
+        String id = (String) map.get("id");
+        String mobile = (String) map.get("mobile");
 
+
+        String gender = param.get("gender");
+        String nickname = param.get("nickname");
+        String birthday = param.get("birthday");
+        String city = param.get("city");
+        String header = param.get("header");
     }
 }

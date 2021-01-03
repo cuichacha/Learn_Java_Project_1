@@ -50,32 +50,10 @@ public class LoginController {
 
     // 获取前台传过来的用户信息，
     @PostMapping("/loginReginfo")
-    public void saveUserInfo(@RequestParam String Authorization, @RequestBody Map<String, String> param) {
+    public void saveUserInfo(@RequestHeader String Authorization, @RequestBody Map<String, String> param) {
 //        Map<String, String> param = JSON.parseObject(parameter, Map.class);
-        String gender = param.get("gender");
-        String nickname = param.get("nickname");
-        String birthday = param.get("birthday");
-        String city = param.get("city");
-        String header = param.get("header");
 
-        UserInfo userInfo = new UserInfo();
-        switch (gender) {
-            case "1":
-                userInfo.setSex(SexEnum.MAN);
-            case "2":
-                userInfo.setSex(SexEnum.WOMAN);
-            case "3":
-                userInfo.setSex(SexEnum.UNKNOWN);
-        }
-//        userInfo.setSex();
-        userInfo.setNickName(nickname);
-        userInfo.setBirthday(birthday);
-        userInfo.setCity(city);
-        userInfo.setLogo(header);
-        String id = UUID.randomUUID().toString();
-        long userId = Long.parseLong(id);
-        userInfo.setUserId(userId);
-        loginService.addUserInfo(userInfo);
+        loginService.saveUserInfo(Authorization, param);
     }
 }
 
