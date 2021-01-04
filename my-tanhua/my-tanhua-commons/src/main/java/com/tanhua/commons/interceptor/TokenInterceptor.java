@@ -15,15 +15,12 @@ public class TokenInterceptor implements HandlerInterceptor {
     @Autowired
     private RedisTemplate<String, String> redisTemplate;
 
-    @Value("${jwt.secret}")
-    private String secret;
-
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         String token = request.getHeader("Authorization");
         if (token == null) {
             return true;
         }
-        return TokenUtil.verifyToken(redisTemplate, token, secret);
+        return TokenUtil.verifyToken(redisTemplate, token);
     }
 }

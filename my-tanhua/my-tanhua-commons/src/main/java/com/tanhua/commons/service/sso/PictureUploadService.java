@@ -1,6 +1,5 @@
-package com.tanhua.commons.service;
+package com.tanhua.commons.service.sso;
 
-import com.tanhua.commons.vo.PictureUploadResult;
 import org.springframework.web.multipart.MultipartFile;
 
 public interface PictureUploadService {

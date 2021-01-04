@@ -1,6 +1,5 @@
 package com.tanhua.sso.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.tanhua.commons.constants.RedisKey;
 import com.tanhua.commons.enums.SexEnum;
@@ -15,14 +14,13 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import com.tanhua.commons.pojo.User;
-import com.tanhua.commons.pojo.UserInfo;
-import com.tanhua.commons.service.LoginService;
+import com.tanhua.commons.pojo.sso.User;
+import com.tanhua.commons.pojo.sso.UserInfo;
+import com.tanhua.commons.service.sso.LoginService;
 import com.tanhua.commons.utils.TokenUtil;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -94,7 +92,7 @@ public class LoginServiceImpl implements LoginService {
             redisTemplate.opsForValue().set(idCache, id, 12L, TimeUnit.HOURS);
             redisTemplate.opsForValue().set(phoneCache, phone, 12L, TimeUnit.HOURS);
 
-            String token = TokenUtil.generateToken(id, mobile, secret);
+            String token = TokenUtil.generateToken(id, mobile);
             map.put("token", token);
             if (isNewUser) {
                 map.put("isNew", Boolean.valueOf("true"));
@@ -135,7 +133,7 @@ public class LoginServiceImpl implements LoginService {
 
     @Override
     public ResponseEntity<Object> addUserAvatar(String token, String avatarUrl) {
-        Map<String, Object> map = TokenUtil.parseToken(token, secret);
+        Map<String, Object> map = TokenUtil.parseToken(token);
         Object id = map.get("id");
         UserInfo userInfo = new UserInfo();
 //        userInfo.setUserId(id);
@@ -165,7 +163,7 @@ public class LoginServiceImpl implements LoginService {
     public Boolean saveUserInfo(String Authorization, Map<String, String> param) {
         // 先校验token，拦截器中已完成
 
-        Map<String, Object> map = TokenUtil.parseToken(Authorization, secret);
+        Map<String, Object> map = TokenUtil.parseToken(Authorization);
         String idStr = (String) map.get("id");
         long id = Long.parseLong(idStr);
         String gender = param.get("gender");

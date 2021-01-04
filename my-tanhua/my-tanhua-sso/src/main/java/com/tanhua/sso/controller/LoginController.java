@@ -1,17 +1,14 @@
 package com.tanhua.sso.controller;
 
 
-import com.tanhua.commons.enums.SexEnum;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import com.tanhua.commons.pojo.UserInfo;
-import com.tanhua.commons.service.LoginService;
+import com.tanhua.commons.service.sso.LoginService;
 import com.tanhua.commons.vo.ErrorResult;
 
 import java.util.Map;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/user")

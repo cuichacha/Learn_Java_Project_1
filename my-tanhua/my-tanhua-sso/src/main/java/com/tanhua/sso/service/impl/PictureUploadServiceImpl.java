@@ -2,14 +2,11 @@ package com.tanhua.sso.service.impl;
 
 import com.aliyun.oss.OSSClient;
 import com.tanhua.commons.config.AliyunConfig;
-import com.tanhua.commons.service.LoginService;
-import com.tanhua.commons.service.PictureUploadService;
-import com.tanhua.commons.vo.PictureUploadResult;
+import com.tanhua.commons.service.sso.PictureUploadService;
 
 //import com.tanhua.sso.config.AliyunConfig;
 import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.time.DateUtils;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

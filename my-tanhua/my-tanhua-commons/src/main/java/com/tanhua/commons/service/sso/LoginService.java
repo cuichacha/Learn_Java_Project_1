@@ -1,8 +1,8 @@
-package com.tanhua.commons.service;
+package com.tanhua.commons.service.sso;
 
 
-import com.tanhua.commons.pojo.User;
-import com.tanhua.commons.pojo.UserInfo;
+import com.tanhua.commons.pojo.sso.User;
+import com.tanhua.commons.pojo.sso.UserInfo;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;

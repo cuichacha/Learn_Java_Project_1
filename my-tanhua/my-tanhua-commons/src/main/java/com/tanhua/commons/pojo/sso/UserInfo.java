@@ -1,4 +1,4 @@
-package com.tanhua.commons.pojo;
+package com.tanhua.commons.pojo.sso;
 
 
 import com.tanhua.commons.enums.SexEnum;

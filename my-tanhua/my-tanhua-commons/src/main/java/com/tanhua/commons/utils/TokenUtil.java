@@ -5,8 +5,10 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwsHeader;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 
+import javax.annotation.PostConstruct;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -15,7 +17,12 @@ public class TokenUtil {
     private TokenUtil() {
     }
 
-    public static String generateToken(String id, String phone, String secret) {
+//    @Value("${jwt.secret}")
+//    private static String secret;
+
+    public static String generateToken(String id, String phone) {
+        String secret = "76bd425b6f29f7fcc2e0bfc286043df1";
+
         // 生成token
         Map<String, Object> header = new HashMap<String, Object>();
         header.put(JwsHeader.TYPE, JwsHeader.JWT_TYPE);
@@ -31,13 +38,14 @@ public class TokenUtil {
         return token;
     }
 
-    public static Map<String, Object> parseToken(String token, String secret) {
+    public static Map<String, Object> parseToken(String token) {
+        String secret = "76bd425b6f29f7fcc2e0bfc286043df1";
         Map<String, Object> body = Jwts.parser().setSigningKey(secret).parseClaimsJws(token).getBody();
         return body;
     }
 
-    public static Boolean verifyToken(RedisTemplate<String, String> redisTemplate, String token, String secret) {
-        Map<String, Object> map = parseToken(token, secret);
+    public static Boolean verifyToken(RedisTemplate<String, String> redisTemplate, String token) {
+        Map<String, Object> map = parseToken(token);
         String id = (String) map.get("id");
         String mobile = (String) map.get("mobile");
         String idCache = RedisKey.ID_CACHE + id;

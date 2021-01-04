@@ -1,16 +1,13 @@
 package com.tanhua.sso.controller;
 
-import com.tanhua.commons.service.LoginService;
-import com.tanhua.commons.service.PictureUploadService;
+import com.tanhua.commons.service.sso.LoginService;
+import com.tanhua.commons.service.sso.PictureUploadService;
 import com.tanhua.commons.vo.ErrorResult;
-import com.tanhua.commons.vo.PictureUploadResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
 
 @RestController
 @RequestMapping("/user")
