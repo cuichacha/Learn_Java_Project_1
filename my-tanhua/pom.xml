@@ -7,6 +7,7 @@
     <modules>
         <module>my-tanhua-sso</module>
         <module>my-tanhua-commons</module>
+        <module>my-tanhua-recommend</module>
     </modules>
 
     <parent>
