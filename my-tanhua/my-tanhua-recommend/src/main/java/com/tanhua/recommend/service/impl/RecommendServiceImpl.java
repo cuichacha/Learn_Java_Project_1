@@ -26,13 +26,6 @@ public class RecommendServiceImpl implements RecommendService {
     private TodayBestMapper todayBestMapper;
 
     @Override
-    public List<RecommendUser> findRecommendUsersById(String token) {
-
-
-        return null;
-    }
-
-    @Override
     public TodayBest findTodayBest(String token) {
 
         Map<String, Object> map = TokenUtil.parseToken(token);
@@ -54,7 +47,6 @@ public class RecommendServiceImpl implements RecommendService {
         todayBest.setGender(userInfo.getSex().getValue() == 1 ? "男" : "女");
         double score = Math.floor(recommendUser.getScore());//取整,98.2 -> 98
         todayBest.setFateValue(Double.valueOf(score).longValue());
-
         todayBest.setNickname(userInfo.getNickName());
         todayBest.setAvatar(userInfo.getLogo());
         String[] tags = userInfo.getTags().split(",");
