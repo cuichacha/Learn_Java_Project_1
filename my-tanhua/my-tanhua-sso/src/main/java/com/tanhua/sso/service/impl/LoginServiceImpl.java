@@ -3,7 +3,7 @@ package com.tanhua.sso.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.tanhua.commons.constants.RedisKey;
 import com.tanhua.commons.enums.SexEnum;
-import com.tanhua.commons.vo.ErrorResult;
+import com.tanhua.commons.vo.sso.ErrorResult;
 import com.tanhua.sso.mapper.UserInfoMapper;
 import com.tanhua.sso.mapper.UserMapper;
 

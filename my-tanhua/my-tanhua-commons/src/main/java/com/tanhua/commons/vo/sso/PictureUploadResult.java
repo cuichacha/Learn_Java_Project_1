@@ -1,4 +1,4 @@
-package com.tanhua.commons.vo;
+package com.tanhua.commons.vo.sso;
 
 public class PictureUploadResult {
     // 文件唯一标识

@@ -1,4 +1,4 @@
-package com.tanhua.commons.vo;
+package com.tanhua.commons.vo.recommend;
 
 import java.util.Arrays;
 

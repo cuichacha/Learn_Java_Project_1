@@ -2,7 +2,7 @@ package com.tanhua.sso.controller;
 
 import com.tanhua.commons.service.sso.LoginService;
 import com.tanhua.commons.service.sso.PictureUploadService;
-import com.tanhua.commons.vo.ErrorResult;
+import com.tanhua.commons.vo.sso.ErrorResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

@@ -4,7 +4,7 @@ import com.tanhua.commons.pojo.recommend.RecommendUser;
 import com.tanhua.commons.pojo.sso.UserInfo;
 import com.tanhua.commons.service.recommend.RecommendService;
 import com.tanhua.commons.utils.TokenUtil;
-import com.tanhua.commons.vo.TodayBest;
+import com.tanhua.commons.vo.recommend.TodayBest;
 import com.tanhua.recommend.mapper.TodayBestMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
@@ -13,7 +13,6 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Map;
 
 @Service

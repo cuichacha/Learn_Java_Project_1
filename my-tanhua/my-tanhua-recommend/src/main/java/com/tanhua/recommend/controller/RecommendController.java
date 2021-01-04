@@ -1,9 +1,8 @@
 package com.tanhua.recommend.controller;
 
-import com.tanhua.commons.pojo.recommend.RecommendUser;
 import com.tanhua.commons.service.recommend.RecommendService;
-import com.tanhua.commons.vo.ErrorResult;
-import com.tanhua.commons.vo.TodayBest;
+import com.tanhua.commons.vo.sso.ErrorResult;
+import com.tanhua.commons.vo.recommend.TodayBest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
