@@ -1,6 +1,10 @@
 package com.tanhua.commons.pojo.recommend;
 
-public class QueryUser {
+import java.io.Serializable;
+
+public class QueryUser implements Serializable {
+    private static final long serialVersionUID = -4296017160071130963L;
+
     private Integer page = 1; //当前页数
     private Integer pagesize = 10; //页尺寸
     private String gender; //性别 man woman

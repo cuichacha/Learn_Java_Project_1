@@ -2,7 +2,11 @@ package com.tanhua.commons.pojo.sso;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-public class User extends BasePojo {
+import java.io.Serializable;
+
+public class User extends BasePojo implements Serializable {
+    private static final long serialVersionUID = -4296017160071130965L;
+
     private Long id;
     private String mobile;
     @JsonIgnore

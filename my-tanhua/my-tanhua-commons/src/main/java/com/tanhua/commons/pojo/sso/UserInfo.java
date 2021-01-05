@@ -3,7 +3,11 @@ package com.tanhua.commons.pojo.sso;
 
 import com.tanhua.commons.enums.SexEnum;
 
-public class UserInfo extends BasePojo {
+import java.io.Serializable;
+
+public class UserInfo extends BasePojo implements Serializable {
+    private static final long serialVersionUID = -4296017160071130966L;
+
     private Long id;
     private Long userId; //用户id
     private String nickName; //昵称
