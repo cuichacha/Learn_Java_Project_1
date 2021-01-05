@@ -1,6 +1,7 @@
 package com.tanhua.recommend.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.tanhua.commons.annotation.Cache;
 import com.tanhua.commons.pojo.recommend.QueryUser;
 import com.tanhua.commons.pojo.recommend.RecommendUser;
 import com.tanhua.commons.pojo.sso.UserInfo;

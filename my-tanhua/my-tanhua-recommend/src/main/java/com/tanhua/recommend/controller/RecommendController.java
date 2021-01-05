@@ -1,5 +1,6 @@
 package com.tanhua.recommend.controller;
 
+import com.tanhua.commons.annotation.Cache;
 import com.tanhua.commons.pojo.recommend.QueryUser;
 import com.tanhua.commons.service.recommend.RecommendService;
 import com.tanhua.commons.vo.recommend.RecommendUsers;
@@ -30,6 +31,7 @@ public class RecommendController {
     }
 
     @GetMapping("/recommendation")
+    @Cache(time = "60")
     public ResponseEntity<RecommendUsers> findRecommendUsers(@RequestHeader("Authorization") String token, QueryUser queryUser) {
         RecommendUsers recommendUsers = recommendService.findRecommendUsers(token, queryUser);
         if (recommendUsers == null) {
