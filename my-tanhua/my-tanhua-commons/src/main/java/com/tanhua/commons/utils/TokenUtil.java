@@ -44,6 +44,13 @@ public class TokenUtil {
         return body;
     }
 
+    public static Long parseToken2Id(String token) {
+        Map<String, Object> map = parseToken(token);
+        String idStr = (String) map.get("id");
+        long id = Long.parseLong(idStr);
+        return id;
+    }
+
     public static Boolean verifyToken(RedisTemplate<String, String> redisTemplate, String token) {
         Map<String, Object> map = parseToken(token);
         String id = (String) map.get("id");
