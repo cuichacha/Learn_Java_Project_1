@@ -1,5 +1,6 @@
 package com.tanhua.moments.controller;
 
+import com.tanhua.commons.annotation.Cache;
 import com.tanhua.commons.service.moments.MovementsService;
 import com.tanhua.commons.vo.moments.MovementsResult;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,18 +33,20 @@ public class MovementsController {
     }
 
     @GetMapping
+    @Cache(time = "60")
     public MovementsResult queryFriendsMovements(@RequestHeader("Authorization") String token,
-                                                 @RequestParam(value = "page", required = false) Integer startPage,
-                                                 @RequestParam(value = "pagesize", required = false) Integer pageSize) {
+                                                 @RequestParam(value = "page") Integer startPage,
+                                                 @RequestParam(value = "pagesize") Integer pageSize) {
 
         MovementsResult movementsResult = movementsService.queryFriendsMovements(token, startPage, pageSize);
         return movementsResult;
     }
 
     @GetMapping("/recommend")
+    @Cache(time = "60")
     public MovementsResult queryRecommendedMovements(@RequestHeader("Authorization") String token,
-                                                     @RequestParam(value = "page" ,required = false) Integer startPage,
-                                                     @RequestParam(value = "pagesize", required = false) Integer pageSize) {
+                                                     @RequestParam(value = "page") Integer startPage,
+                                                     @RequestParam(value = "pagesize") Integer pageSize) {
 
         MovementsResult movementsResult = movementsService.queryFriendsMovements(token, startPage, pageSize);
         return movementsResult;
