@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tanhua.commons.constants.RedisKey;
 import org.apache.commons.codec.digest.DigestUtils;
+import org.bson.types.ObjectId;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -22,5 +23,13 @@ public class RedisKeyUtil {
         String data = requestURL + "_" + valueAsString + "_" + token;
         String name = DigestUtils.md5Hex(data);
         return RedisKey.SERVER_CACHE + name;
+    }
+
+    public static String generateCacheRedisKey(ObjectId publishId, Integer commentType, Long userId) {
+        String str1 = publishId.toString();
+        String str2 = String.valueOf(userId);
+        String str3 = String.valueOf(commentType);
+        String redisKey = DigestUtils.md5Hex((str1 + str2 + str3));
+        return redisKey;
     }
 }

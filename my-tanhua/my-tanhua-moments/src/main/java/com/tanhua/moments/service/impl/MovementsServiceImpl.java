@@ -1,10 +1,10 @@
 package com.tanhua.moments.service.impl;
 
-import com.aliyun.oss.OSSClient;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.tanhua.commons.pojo.moments.*;
 import com.tanhua.commons.pojo.sso.UserInfo;
 import com.tanhua.commons.service.moments.MovementsService;
+import com.tanhua.commons.utils.RedisKeyUtil;
 import com.tanhua.commons.utils.RelativeDateFormat;
 import com.tanhua.commons.utils.TokenUtil;
 import com.tanhua.commons.vo.moments.MovementsResult;
@@ -16,6 +16,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -34,6 +35,9 @@ public class MovementsServiceImpl implements MovementsService {
 
     @Autowired
     private PictureUploadServiceImpl pictureUploadService;
+
+    @Autowired
+    private RedisTemplate<String, String> redisTemplate;
 
     @Override
     public MovementsResult queryFriendsMovements(String token, Integer startPage, Integer pageSize) {
@@ -66,8 +70,8 @@ public class MovementsServiceImpl implements MovementsService {
 
         List<Movements> movementsList = new ArrayList<>();
 
-        // 组合查询到的数据
 
+        // 组合查询到的数据
         for (Publish publish : publishList) {
             Movements movements = new Movements();
             movements.setId(publish.getId().toHexString());
@@ -81,12 +85,26 @@ public class MovementsServiceImpl implements MovementsService {
             movements.setTextContent(publish.getText());
             movements.setUserId(publish.getUserId());
             movements.setCreateDate(RelativeDateFormat.format(new Date(publish.getCreated())));
-            movements.setCommentCount(10); //TODO 评论数
+
+            // 查询真实评论数
+            Long commentNumber = countComment(publish.getId(), 2, publish.getUserId());
+            movements.setCommentCount(commentNumber.intValue());
+
             movements.setDistance("1.2公里"); //TODO 距离
-            movements.setHasLiked(1); //TODO 是否点赞（1是，0否）
-            movements.setHasLoved(0); //TODO 是否喜欢（1是，0否）
-            movements.setLikeCount(100); //TODO 点赞数
-            movements.setLoveCount(80); //TODO 喜欢数
+
+            // 有无点赞，刚查询出来肯定没有
+            movements.setHasLiked(0);
+            // 有无喜欢，刚查询出来肯定没有
+            movements.setHasLoved(0);
+
+            // 查询真实点赞数
+            Long likeNumber = countComment(publish.getId(), 1, publish.getUserId());
+            movements.setLikeCount(likeNumber.intValue());
+
+            // 查询真实喜欢数
+            Long loveNumber = countComment(publish.getId(), 3, publish.getUserId());
+            movements.setLoveCount(loveNumber.intValue());
+
             movementsList.add(movements);
         }
 
@@ -120,9 +138,25 @@ public class MovementsServiceImpl implements MovementsService {
 
     @Override
     public MovementsResult queryRecommendedMovements(String token, Integer startPage, Integer pageSize) {
-
         return null;
     }
+
+    @Override
+    public Long countComment(ObjectId publishId, Integer commentType, Long userId) {
+        if (commentType == 1 || commentType == 2 || commentType == 3) {
+            Query query = Query.query(Criteria.where("publishId").is(publishId)
+                    .andOperator(Criteria.where("commentType").is(commentType)));
+            long result = mongoTemplate.count(query, "quanzi_comment");
+
+            // 将数据缓存进Redis
+            String redisKey = RedisKeyUtil.generateCacheRedisKey(publishId, commentType, userId);
+            redisTemplate.opsForValue().set(redisKey, String.valueOf(result));
+
+            return result;
+        }
+        return 0L;
+    }
+
 
     @Override
     public Boolean publishMoment(String token, String textContent, String location, String latitude, String longitude, MultipartFile[] multipartFile) {
@@ -193,5 +227,11 @@ public class MovementsServiceImpl implements MovementsService {
             }
         }
         return true;
+    }
+
+    @Override
+    public Long likeComment(String token, ObjectId publishId) {
+
+        return null;
     }
 }
