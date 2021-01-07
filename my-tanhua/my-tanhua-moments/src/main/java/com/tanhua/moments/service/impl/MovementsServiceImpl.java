@@ -1,6 +1,7 @@
 package com.tanhua.moments.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.tanhua.commons.constants.RedisKey;
 import com.tanhua.commons.pojo.moments.*;
 import com.tanhua.commons.pojo.sso.UserInfo;
 import com.tanhua.commons.service.moments.MovementsService;
@@ -9,6 +10,7 @@ import com.tanhua.commons.utils.RelativeDateFormat;
 import com.tanhua.commons.utils.TokenUtil;
 import com.tanhua.commons.vo.moments.MovementsResult;
 import com.tanhua.moments.mapper.UserInfoMapper;
+import javafx.scene.shape.MoveTo;
 import org.apache.rocketmq.spring.core.RocketMQTemplate;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -77,37 +79,7 @@ public class MovementsServiceImpl implements MovementsService {
         // 组合查询到的数据
         for (Publish publish : publishList) {
             Movements movements = new Movements();
-            movements.setId(publish.getId().toHexString());
-//                    List<String> medias = publish.getMedias();
-//                    String[] strings = new String[medias.size()];
-//                    for (int i = 0; i < medias.size(); i++) {
-//                        strings[i] = medias.get(i);
-//                    }
-//                    movements.setImageContent(strings);
-            movements.setImageContent(publish.getMedias().toArray(new String[]{}));
-            movements.setTextContent(publish.getText());
-            movements.setUserId(publish.getUserId());
-            movements.setCreateDate(RelativeDateFormat.format(new Date(publish.getCreated())));
-
-            // 查询真实评论数
-            Long commentNumber = countComment(publish.getId(), 2);
-            movements.setCommentCount(commentNumber.intValue());
-
-            movements.setDistance("1.2公里"); //TODO 距离
-
-            // 有无点赞，刚查询出来肯定没有
-            movements.setHasLiked(0);
-            // 有无喜欢，刚查询出来肯定没有
-            movements.setHasLoved(0);
-
-            // 查询真实点赞数
-            Long likeNumber = countComment(publish.getId(), 1);
-            movements.setLikeCount(likeNumber.intValue());
-
-            // 查询真实喜欢数
-            Long loveNumber = countComment(publish.getId(), 3);
-            movements.setLoveCount(loveNumber.intValue());
-
+            fillPublishToMovements(movements, publish);
             movementsList.add(movements);
         }
 
@@ -115,14 +87,7 @@ public class MovementsServiceImpl implements MovementsService {
         // 组合查询到的数据
         for (UserInfo userInfo : userInfos) {
             for (Movements movements : movementsList) {
-                if (movements.getUserId().equals(userInfo.getUserId())) {
-                    movements.setUserId(userInfo.getUserId());
-                    movements.setAge(userInfo.getAge());
-                    movements.setAvatar(userInfo.getLogo());
-                    movements.setGender(userInfo.getSex().name().toLowerCase());
-                    movements.setNickname(userInfo.getNickName());
-                    movements.setTags(userInfo.getTags().split(","));
-                }
+                fillUserInfoToMovements(movements, userInfo);
             }
         }
 
@@ -144,6 +109,7 @@ public class MovementsServiceImpl implements MovementsService {
         return null;
     }
 
+    // 动态评论数统计
     @Override
     public Long countComment(ObjectId publishId, Integer commentType) {
         if (commentType == 1 || commentType == 2 || commentType == 3) {
@@ -153,14 +119,27 @@ public class MovementsServiceImpl implements MovementsService {
             long result = mongoTemplate.count(query, "quanzi_comment");
 
             // 将数据缓存进Redis
-            String redisKey = RedisKeyUtil.generateCacheRedisKey(publishId, commentType);
+
+            String redisKey = null;
+
+            // 点赞类型，生成点赞类型的redisKey
+            if (commentType == 1) {
+                redisKey = RedisKeyUtil.generateCacheRedisKey(publishId, commentType)
+                        + "_" + RedisKey.MOVEMENT_LIKE_CACHE;
+            }
+
+            // 喜欢类型，生成喜欢类型的redisKey
+            if (commentType == 3) {
+                redisKey = RedisKeyUtil.generateCacheRedisKey(publishId, commentType)
+                        + "_" + RedisKey.MOVEMENT_LOVE_CACHE;
+            }
             redisTemplate.opsForValue().set(redisKey, String.valueOf(result), 60, TimeUnit.SECONDS);
             return result;
         }
         return 0L;
     }
 
-
+    // 发布动态
     @Override
     public Boolean publishMoment(String token, String textContent, String location, String latitude, String longitude, MultipartFile[] multipartFile) {
         List<String> medias = new ArrayList<>();
@@ -232,14 +211,26 @@ public class MovementsServiceImpl implements MovementsService {
         return true;
     }
 
+    // 点赞 / 喜欢
     @Override
     public Long supportComment(String token, ObjectId publishId, Integer commentType) {
         // 根据token查询当前登录用户ID
         Long userId = TokenUtil.parseToken2Id(token);
 
+        String redisKey = null;
+        Long redisValue = null;
         // 去Redis中查询数据
-        String redisKey = RedisKeyUtil.generateCacheRedisKey(publishId, commentType);
-        Long redisValue = redisTemplate.opsForValue().increment(redisKey);
+        if (commentType == 1) {
+            redisKey = RedisKeyUtil.generateCacheRedisKey(publishId, commentType)
+                    + "_" + RedisKey.MOVEMENT_LIKE_CACHE;
+        }
+        if (commentType == 3) {
+            redisKey = RedisKeyUtil.generateCacheRedisKey(publishId, commentType)
+                    + "_" + RedisKey.MOVEMENT_LOVE_CACHE;
+        }
+        if (redisKey != null) {
+            redisValue = redisTemplate.opsForValue().increment(redisKey);
+        }
         if (redisValue != null) {
             return redisValue;
         }
@@ -270,8 +261,10 @@ public class MovementsServiceImpl implements MovementsService {
         return null;
     }
 
+    // 获取评论对象
     @Override
     public Comment getComment(ObjectId publishId, Long userId, Integer commentType, String content) {
+        // 封装点赞 / 喜欢的对象
         Comment comment = new Comment();
         comment.setId(ObjectId.get());
         comment.setCommentType(commentType);
@@ -289,14 +282,26 @@ public class MovementsServiceImpl implements MovementsService {
         return comment;
     }
 
+    // 取消点赞 / 取消喜欢
     @Override
     public Long opposeComment(String token, ObjectId publishId, Integer commentType) {
         // 根据token查询当前登录用户ID
         Long userId = TokenUtil.parseToken2Id(token);
 
+        String redisKey = null;
+        Long redisValue = null;
         // 去Redis中查询数据
-        String redisKey = RedisKeyUtil.generateCacheRedisKey(publishId, commentType);
-        Long redisValue = redisTemplate.opsForValue().decrement(redisKey);
+        if (commentType == 1) {
+            redisKey = RedisKeyUtil.generateCacheRedisKey(publishId, commentType)
+                    + "_" + RedisKey.MOVEMENT_LIKE_CACHE;
+        }
+        if (commentType == 3) {
+            redisKey = RedisKeyUtil.generateCacheRedisKey(publishId, commentType)
+                    + "_" + RedisKey.MOVEMENT_LOVE_CACHE;
+        }
+        if (redisKey != null) {
+            redisValue = redisTemplate.opsForValue().increment(redisKey);
+        }
         if (redisValue != null) {
             return redisValue;
         }
@@ -324,9 +329,90 @@ public class MovementsServiceImpl implements MovementsService {
             rocketMQTemplate.convertAndSend("comment", msg);
 
             // 返回自减结果
+
+            if (decrement != null && decrement < 0L) {
+                decrement = 0L;
+            }
             return decrement;
         }
         return null;
     }
+
+    // 查询单条动态
+    @Override
+    public Movements querySingleMovement(String token, ObjectId publishId) {
+        // 查询单个动态，便于后续的评论操作
+        Movements movements = new Movements();
+        Query publishQuery = Query.query(Criteria.where("_id").is(publishId));
+        Publish publish = mongoTemplate.findOne(publishQuery, Publish.class, "quanzi_publish");
+        if (publish != null) {
+            fillPublishToMovements(movements, publish);
+
+            Long userId = publish.getUserId();
+            QueryWrapper<UserInfo> userInfoQuery = new QueryWrapper<>();
+            userInfoQuery.eq("user_id", userId);
+            UserInfo userInfo = userInfoMapper.selectOne(userInfoQuery);
+
+            fillUserInfoToMovements(movements, userInfo);
+
+            return movements;
+        }
+        return null;
+    }
+
+    @Override
+    public void fillPublishToMovements(Movements movements, Publish publish) {
+        // 将Publish对象封装进Movement对象中
+        movements.setId(publish.getId().toHexString());
+        movements.setImageContent(publish.getMedias().toArray(new String[]{}));
+        movements.setTextContent(publish.getText());
+        movements.setUserId(publish.getUserId());
+        movements.setCreateDate(RelativeDateFormat.format(new Date(publish.getCreated())));
+
+        // 查询真实评论数
+        Long commentNumber = countComment(publish.getId(), 2);
+        movements.setCommentCount(commentNumber.intValue());
+
+        movements.setDistance("1.2公里"); //TODO 距离
+
+        // 有无点赞
+        String likeKey = RedisKeyUtil.generateCacheRedisKey(publish.getId(), 1)
+                + "_" + RedisKey.MOVEMENT_LIKE_CACHE;
+        Boolean isLiked = redisTemplate.hasKey(likeKey);
+        if (isLiked != null) {
+            movements.setHasLiked(isLiked ? 1 : 0); //是否点赞（1是，0否）
+        }
+
+        // 有无喜欢
+        String loveKey = RedisKeyUtil.generateCacheRedisKey(publish.getId(), 3)
+                + "_" + RedisKey.MOVEMENT_LOVE_CACHE;
+        Boolean isLoved = redisTemplate.hasKey(loveKey);
+        if (isLoved != null) {
+            movements.setHasLoved(isLoved ? 1 : 0); //是否点赞（1是，0否）
+        }
+
+        // 查询真实点赞数
+        Long likeNumber = countComment(publish.getId(), 1);
+        movements.setLikeCount(likeNumber.intValue());
+
+        // 查询真实喜欢数
+        Long loveNumber = countComment(publish.getId(), 3);
+        movements.setLoveCount(loveNumber.intValue());
+
+    }
+
+    @Override
+    public void fillUserInfoToMovements(Movements movements, UserInfo userInfo) {
+        // 将UserInfo对象封装进Movement对象中
+        if (movements.getUserId().equals(userInfo.getUserId())) {
+            movements.setUserId(userInfo.getUserId());
+            movements.setAge(userInfo.getAge());
+            movements.setAvatar(userInfo.getLogo());
+            movements.setGender(userInfo.getSex().name().toLowerCase());
+            movements.setNickname(userInfo.getNickName());
+            movements.setTags(userInfo.getTags().split(","));
+        }
+    }
+
 
 }

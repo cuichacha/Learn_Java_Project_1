@@ -1,6 +1,9 @@
 package com.tanhua.commons.service.moments;
 
 import com.tanhua.commons.pojo.moments.Comment;
+import com.tanhua.commons.pojo.moments.Movements;
+import com.tanhua.commons.pojo.moments.Publish;
+import com.tanhua.commons.pojo.sso.UserInfo;
 import com.tanhua.commons.vo.moments.MovementsResult;
 import org.bson.types.ObjectId;
 import org.springframework.web.multipart.MultipartFile;
@@ -22,5 +25,9 @@ public interface MovementsService {
 
     public abstract Long opposeComment(String token, ObjectId publishId, Integer commentType);
 
+    public abstract Movements querySingleMovement(String token, ObjectId publishId);
 
+    public abstract void fillPublishToMovements(Movements movements, Publish publish);
+
+    public abstract void fillUserInfoToMovements(Movements movements, UserInfo userInfo);
 }

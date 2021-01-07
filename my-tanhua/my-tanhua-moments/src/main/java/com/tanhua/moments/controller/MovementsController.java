@@ -1,6 +1,7 @@
 package com.tanhua.moments.controller;
 
 import com.tanhua.commons.annotation.Cache;
+import com.tanhua.commons.pojo.moments.Movements;
 import com.tanhua.commons.service.moments.MovementsService;
 import com.tanhua.commons.vo.moments.MovementsResult;
 import org.bson.types.ObjectId;
@@ -92,6 +93,15 @@ public class MovementsController {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<Movements> querySingleMovement(@RequestHeader("Authorization") String token,
+                                                         @PathVariable("id") ObjectId publishId) {
+        Movements movements = movementsService.querySingleMovement(token, publishId);
+        if (movements != null) {
+            return ResponseEntity.ok(movements);
+        }
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
 
+    }
 
 }
