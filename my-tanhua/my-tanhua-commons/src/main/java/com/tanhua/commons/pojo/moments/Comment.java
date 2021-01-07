@@ -16,13 +16,13 @@ public class Comment implements Serializable {
 
     private Boolean isParent = false; //是否为父节点，默认是否
     private ObjectId parentId; // 父节点id
-
+    private Long publishUserId;
     private Long created; //发表时间
 
     public Comment() {
     }
 
-    public Comment(ObjectId id, ObjectId publishId, Integer commentType, String content, Long userId, Boolean isParent, ObjectId parentId, Long created) {
+    public Comment(ObjectId id, ObjectId publishId, Integer commentType, String content, Long userId, Boolean isParent, ObjectId parentId, Long publishUserId, Long created) {
         this.id = id;
         this.publishId = publishId;
         this.commentType = commentType;
@@ -30,6 +30,7 @@ public class Comment implements Serializable {
         this.userId = userId;
         this.isParent = isParent;
         this.parentId = parentId;
+        this.publishUserId = publishUserId;
         this.created = created;
     }
 
@@ -93,6 +94,14 @@ public class Comment implements Serializable {
         this.parentId = parentId;
     }
 
+    public Long getPublishUserId() {
+        return publishUserId;
+    }
+
+    public void setPublishUserId(Long publishUserId) {
+        this.publishUserId = publishUserId;
+    }
+
     public Long getCreated() {
         return created;
     }
@@ -111,6 +120,7 @@ public class Comment implements Serializable {
                 ", userId=" + userId +
                 ", isParent=" + isParent +
                 ", parentId=" + parentId +
+                ", publishUserId=" + publishUserId +
                 ", created=" + created +
                 '}';
     }

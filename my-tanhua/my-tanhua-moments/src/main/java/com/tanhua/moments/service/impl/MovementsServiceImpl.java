@@ -9,6 +9,7 @@ import com.tanhua.commons.utils.RelativeDateFormat;
 import com.tanhua.commons.utils.TokenUtil;
 import com.tanhua.commons.vo.moments.MovementsResult;
 import com.tanhua.moments.mapper.UserInfoMapper;
+import org.apache.rocketmq.spring.core.RocketMQTemplate;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -20,9 +21,8 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 @Service
 public class MovementsServiceImpl implements MovementsService {
@@ -38,6 +38,9 @@ public class MovementsServiceImpl implements MovementsService {
 
     @Autowired
     private RedisTemplate<String, String> redisTemplate;
+
+    @Autowired
+    private RocketMQTemplate rocketMQTemplate;
 
     @Override
     public MovementsResult queryFriendsMovements(String token, Integer startPage, Integer pageSize) {
@@ -87,7 +90,7 @@ public class MovementsServiceImpl implements MovementsService {
             movements.setCreateDate(RelativeDateFormat.format(new Date(publish.getCreated())));
 
             // 查询真实评论数
-            Long commentNumber = countComment(publish.getId(), 2, publish.getUserId());
+            Long commentNumber = countComment(publish.getId(), 2);
             movements.setCommentCount(commentNumber.intValue());
 
             movements.setDistance("1.2公里"); //TODO 距离
@@ -98,11 +101,11 @@ public class MovementsServiceImpl implements MovementsService {
             movements.setHasLoved(0);
 
             // 查询真实点赞数
-            Long likeNumber = countComment(publish.getId(), 1, publish.getUserId());
+            Long likeNumber = countComment(publish.getId(), 1);
             movements.setLikeCount(likeNumber.intValue());
 
             // 查询真实喜欢数
-            Long loveNumber = countComment(publish.getId(), 3, publish.getUserId());
+            Long loveNumber = countComment(publish.getId(), 3);
             movements.setLoveCount(loveNumber.intValue());
 
             movementsList.add(movements);
@@ -142,16 +145,16 @@ public class MovementsServiceImpl implements MovementsService {
     }
 
     @Override
-    public Long countComment(ObjectId publishId, Integer commentType, Long userId) {
+    public Long countComment(ObjectId publishId, Integer commentType) {
         if (commentType == 1 || commentType == 2 || commentType == 3) {
+            // 根据评论类型去查询真实数据
             Query query = Query.query(Criteria.where("publishId").is(publishId)
                     .andOperator(Criteria.where("commentType").is(commentType)));
             long result = mongoTemplate.count(query, "quanzi_comment");
 
             // 将数据缓存进Redis
-            String redisKey = RedisKeyUtil.generateCacheRedisKey(publishId, commentType, userId);
-            redisTemplate.opsForValue().set(redisKey, String.valueOf(result));
-
+            String redisKey = RedisKeyUtil.generateCacheRedisKey(publishId, commentType);
+            redisTemplate.opsForValue().set(redisKey, String.valueOf(result), 60, TimeUnit.SECONDS);
             return result;
         }
         return 0L;
@@ -230,8 +233,100 @@ public class MovementsServiceImpl implements MovementsService {
     }
 
     @Override
-    public Long likeComment(String token, ObjectId publishId) {
+    public Long supportComment(String token, ObjectId publishId, Integer commentType) {
+        // 根据token查询当前登录用户ID
+        Long userId = TokenUtil.parseToken2Id(token);
 
+        // 去Redis中查询数据
+        String redisKey = RedisKeyUtil.generateCacheRedisKey(publishId, commentType);
+        Long redisValue = redisTemplate.opsForValue().increment(redisKey);
+        if (redisValue != null) {
+            return redisValue;
+        }
+        // 如果Redis中没有查到数据，就去表中查询，查询方法里会向Redis中写入数据
+        Long likeNumber = countComment(publishId, commentType);
+        if (likeNumber != null) {
+            Long increment = redisTemplate.opsForValue().increment(redisKey);
+
+            // 开启一个新的线程，去进行MongoDB表的增加或者删除
+//            new Thread(new Runnable() {
+//                @Override
+//                public void run() {
+//                    Comment comment = getComment(publishId, userId, commentType, null);
+//                    mongoTemplate.insert(comment, "quanzi_comment");
+//                }
+//            }).start();
+
+            // 通过MQ发送消息，进行MongoDB表的增加或者删除 1-增加 2-删除
+            Map<String, Object> msg = new HashMap<>();
+            Comment comment = getComment(publishId, userId, commentType, null);
+            msg.put("add", comment);
+            msg.put("type", 1);
+            rocketMQTemplate.convertAndSend("comment", msg);
+
+            // 返回自增结果
+            return increment;
+        }
         return null;
     }
+
+    @Override
+    public Comment getComment(ObjectId publishId, Long userId, Integer commentType, String content) {
+        Comment comment = new Comment();
+        comment.setId(ObjectId.get());
+        comment.setCommentType(commentType);
+        comment.setCreated(System.currentTimeMillis());
+        comment.setParent(false);
+        comment.setPublishId(publishId);
+        comment.setUserId(userId);
+        comment.setContent(content);
+        Query query = Query.query(Criteria.where("_id").is(publishId));
+        Publish publish = mongoTemplate.findOne(query, Publish.class, "quanzi_publish");
+        if (publish != null) {
+            Long publishUserId = publish.getUserId();
+            comment.setPublishUserId(publishUserId);
+        }
+        return comment;
+    }
+
+    @Override
+    public Long opposeComment(String token, ObjectId publishId, Integer commentType) {
+        // 根据token查询当前登录用户ID
+        Long userId = TokenUtil.parseToken2Id(token);
+
+        // 去Redis中查询数据
+        String redisKey = RedisKeyUtil.generateCacheRedisKey(publishId, commentType);
+        Long redisValue = redisTemplate.opsForValue().decrement(redisKey);
+        if (redisValue != null) {
+            return redisValue;
+        }
+        // 如果Redis中没有查到数据，就去表中查询，查询方法里会向Redis中写入数据
+        Long disLikeNumber = countComment(publishId, commentType);
+        if (disLikeNumber != null) {
+            Long decrement = redisTemplate.opsForValue().increment(redisKey);
+
+            // 开启一个新的线程，去进行MongoDB表的增加或者删除
+//            new Thread(new Runnable() {
+//                @Override
+//                public void run() {
+//                    Query query = Query.query(Criteria.where("userId").is(userId)
+//                            .andOperator(Criteria.where("publishId").is(publishId)));
+//                    mongoTemplate.remove(query, "quanzi_comment");
+//                }
+//            }).start();
+
+            // 通过MQ发送消息，进行MongoDB表的增加或者删除 1-增加 2-删除
+            Map<String, Object> msg = new HashMap<>();
+            Query query = Query.query(Criteria.where("userId").is(userId)
+                    .andOperator(Criteria.where("publishId").is(publishId)));
+            msg.put("remove", query);
+            msg.put("type", 2);
+            rocketMQTemplate.convertAndSend("comment", msg);
+
+            // 返回自减结果
+            return decrement;
+        }
+        return null;
+    }
+
 }

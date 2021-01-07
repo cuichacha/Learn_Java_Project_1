@@ -55,11 +55,43 @@ public class MovementsController {
     @GetMapping("/{id}/like")
     public ResponseEntity<Long> likeComment(@RequestHeader("Authorization") String token,
                                             @PathVariable("id") ObjectId publishId) {
-        Long result = movementsService.likeComment(token, publishId);
+        Long result = movementsService.supportComment(token, publishId, 1);
         if (result != null) {
             return ResponseEntity.ok(result);
         }
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
     }
+
+    @GetMapping("/{id}/dislike")
+    public ResponseEntity<Long> disLikeComment(@RequestHeader("Authorization") String token,
+                                            @PathVariable("id") ObjectId publishId) {
+        Long result = movementsService.opposeComment(token, publishId, 1);
+        if (result != null) {
+            return ResponseEntity.ok(result);
+        }
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+    }
+
+    @GetMapping("/{id}/love")
+    public ResponseEntity<Long> loveComment(@RequestHeader("Authorization") String token,
+                                            @PathVariable("id") ObjectId publishId) {
+        Long result = movementsService.supportComment(token, publishId, 3);
+        if (result != null) {
+            return ResponseEntity.ok(result);
+        }
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+    }
+
+    @GetMapping("/{id}/dislove")
+    public ResponseEntity<Long> disLoveComment(@RequestHeader("Authorization") String token,
+                                               @PathVariable("id") ObjectId publishId) {
+        Long result = movementsService.opposeComment(token, publishId, 3);
+        if (result != null) {
+            return ResponseEntity.ok(result);
+        }
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+    }
+
+
 
 }
