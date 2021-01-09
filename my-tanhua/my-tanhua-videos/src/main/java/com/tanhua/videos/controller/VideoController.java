@@ -64,7 +64,7 @@ public class VideoController {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
     }
 
-    @GetMapping("/{id}/dislike")
+    @GetMapping("{id}/dislike")
     public ResponseEntity<Long> disLikeVideo(@RequestHeader("Authorization") String token,
                                              @PathVariable("id") ObjectId publishId) {
         try {
@@ -93,8 +93,9 @@ public class VideoController {
     @PostMapping("/{id}/comments")
     public ResponseEntity<Void> publishVideoComments(@RequestHeader("Authorization") String token,
                                                      @PathVariable("id") ObjectId videoId,
-                                                     @RequestBody String comment) {
+                                                     @RequestBody Map<String, String> param) {
 
+        String comment = param.get("comment");
         Boolean result = commentsService.publishComment(token, videoId, comment);
         if (result) {
             return ResponseEntity.ok(null);
@@ -113,9 +114,9 @@ public class VideoController {
     }
 
     @PostMapping("/comments/{id}/dislike")
-    public ResponseEntity<Long> disCommentsLikeComment(@RequestHeader("Authorization") String token,
-                                                       @PathVariable("id") ObjectId publishId) {
-        Long result = commentsService.disLikeComment(token, publishId);
+    public ResponseEntity<Long> dislikeVideoComment(@RequestHeader("Authorization") String token,
+                                                    @PathVariable("id") String publishId) {
+        Long result = commentsService.dislikeComment(token, new ObjectId(publishId));
         if (result != null) {
             return ResponseEntity.ok(result);
         }
@@ -124,7 +125,7 @@ public class VideoController {
 
     @PostMapping("/{id}/userFocus")
     public ResponseEntity<Void> subscribe(@RequestHeader("Authorization") String token,
-                                                      @PathVariable("id") Long userId) {
+                                          @PathVariable("id") Long userId) {
 
         Boolean result = videoService.subscribe(token, userId);
         if (result != null) {
@@ -135,7 +136,7 @@ public class VideoController {
 
     @PostMapping("/{id}/userUnFocus")
     public ResponseEntity<Void> unsubscribe(@RequestHeader("Authorization") String token,
-                                          @PathVariable("id") Long userId) {
+                                            @PathVariable("id") Long userId) {
 
         Boolean result = videoService.subscribe(token, userId);
         if (result != null) {

@@ -13,7 +13,7 @@ public interface CommentsService {
 
     public abstract Long likeComment(String toke, ObjectId publishId);
 
-    public abstract Long disLikeComment(String toke, ObjectId publishId);
+    public abstract Long dislikeComment(String toke, ObjectId publishId);
 
     public abstract void operateComment(String token, ObjectId publishId);
 

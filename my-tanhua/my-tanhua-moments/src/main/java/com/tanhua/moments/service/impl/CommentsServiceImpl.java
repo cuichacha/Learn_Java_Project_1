@@ -59,7 +59,7 @@ public class CommentsServiceImpl implements CommentsService {
         Query query = Query.query(Criteria.where("publishId").is(movementPublishId)
                 .andOperator(Criteria.where("commentType").is(2))).with(pageRequest);
         // 根据条件查询评论
-        List<Comment> comments = mongoTemplate.find(query, Comment.class, "quanzi_comment");
+        List<Comment> comments = mongoTemplate.find(query, Comment.class);
         List<Long> userIds = new ArrayList<>();
         // 将评论中的userId放入集合
         for (Comment comment : comments) {
@@ -121,7 +121,7 @@ public class CommentsServiceImpl implements CommentsService {
     public Long queryCommentLike(ObjectId movementPublishId, Long userId) {
         // 根据动态ID查询所有评论
         Query movementQuery = Query.query(Criteria.where("publishId").is(movementPublishId));
-        List<Comment> comments = mongoTemplate.find(movementQuery, Comment.class, "quanzi_comment");
+        List<Comment> comments = mongoTemplate.find(movementQuery, Comment.class);
         List<ObjectId> commentLikeIds = new ArrayList<>();
         // 将所有评论的ID，存入集合
         for (Comment comment : comments) {
@@ -131,7 +131,7 @@ public class CommentsServiceImpl implements CommentsService {
         // 将评论ID作为publishID，结合评论类型-->1（点赞），去查询（计算）到所有评论的点赞评论数量
         Query commentQuery = Query.query(Criteria.where("publishId").in(commentLikeIds));
 
-        return mongoTemplate.count(commentQuery, Comment.class, "quanzi_comment");
+        return mongoTemplate.count(commentQuery, Comment.class);
     }
 
     @Override
@@ -146,7 +146,7 @@ public class CommentsServiceImpl implements CommentsService {
             comment.setPublishId(movementPublishId);
             comment.setCreated(System.currentTimeMillis());
             comment.setUserId(TokenUtil.parseToken2Id(token));
-            mongoTemplate.insert(comment, "quanzi_comment");
+            mongoTemplate.insert(comment);
             return true;
         } catch (Exception e) {
             e.printStackTrace();
@@ -165,7 +165,7 @@ public class CommentsServiceImpl implements CommentsService {
     }
 
     @Override
-    public Long disLikeComment(String token, ObjectId publishId) {
+    public Long dislikeComment(String token, ObjectId publishId) {
         operateComment(token, publishId);
         Long decrement = redisTemplate.opsForValue().decrement(commentLikeRedisKey);
         Comment comment = movementsService.getComment(publishId, TokenUtil.parseToken2Id(token), 1, null);

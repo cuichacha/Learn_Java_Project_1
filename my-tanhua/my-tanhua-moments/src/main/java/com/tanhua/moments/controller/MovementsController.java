@@ -55,7 +55,7 @@ public class MovementsController {
 
     @GetMapping("/{id}/like")
     public ResponseEntity<Long> likeMovement(@RequestHeader("Authorization") String token,
-                                            @PathVariable("id") ObjectId publishId) {
+                                             @PathVariable("id") ObjectId publishId) {
         Long result = movementsService.supportMovement(token, publishId, 1);
         if (result != null) {
             return ResponseEntity.ok(result);
@@ -65,7 +65,7 @@ public class MovementsController {
 
     @GetMapping("/{id}/dislike")
     public ResponseEntity<Long> disLikeMovement(@RequestHeader("Authorization") String token,
-                                            @PathVariable("id") ObjectId publishId) {
+                                                @PathVariable("id") ObjectId publishId) {
         Long result = movementsService.opposeMovement(token, publishId, 1);
         if (result != null) {
             return ResponseEntity.ok(result);
@@ -75,7 +75,7 @@ public class MovementsController {
 
     @GetMapping("/{id}/love")
     public ResponseEntity<Long> loveMovement(@RequestHeader("Authorization") String token,
-                                            @PathVariable("id") ObjectId publishId) {
+                                             @PathVariable("id") ObjectId publishId) {
         Long result = movementsService.supportMovement(token, publishId, 3);
         if (result != null) {
             return ResponseEntity.ok(result);
@@ -85,7 +85,7 @@ public class MovementsController {
 
     @GetMapping("/{id}/unlove")
     public ResponseEntity<Long> disLoveMovement(@RequestHeader("Authorization") String token,
-                                               @PathVariable("id") ObjectId publishId) {
+                                                @PathVariable("id") ObjectId publishId) {
         Long result = movementsService.opposeMovement(token, publishId, 3);
         if (result != null) {
             return ResponseEntity.ok(result);

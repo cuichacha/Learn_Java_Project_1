@@ -29,7 +29,7 @@ public class CommentsController {
 
     @PostMapping
     public ResponseEntity<Void> publishComment(@RequestHeader("Authorization") String token,
-                                               @RequestBody Map<String,String> param) {
+                                               @RequestBody Map<String, String> param) {
         String publishId = param.get("movementId");
         ObjectId movementPublishId = new ObjectId(publishId);
         String content = param.get("comment");
@@ -52,8 +52,8 @@ public class CommentsController {
 
     @GetMapping("/{id}/dislike")
     public ResponseEntity<Long> disLikeComment(@RequestHeader("Authorization") String token,
-                                            @PathVariable("id") ObjectId publishId) {
-        Long result = commentsService.disLikeComment(token, publishId);
+                                               @PathVariable("id") ObjectId publishId) {
+        Long result = commentsService.dislikeComment(token, publishId);
         if (result != null) {
             return ResponseEntity.ok(result);
         }

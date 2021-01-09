@@ -1,8 +1,11 @@
 package com.tanhua.commons.vo.moments;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class MovementsResult {
+public class MovementsResult implements Serializable {
+    private static final long serialVersionUID = 432183095092214517L;
+
     private Integer counts;//总记录数
     private Integer pageSize;//页大小
     private Integer pages;//总页数
