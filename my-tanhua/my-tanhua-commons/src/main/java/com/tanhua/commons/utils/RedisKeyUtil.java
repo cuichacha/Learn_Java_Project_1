@@ -25,10 +25,11 @@ public class RedisKeyUtil {
         return RedisKey.SERVER_CACHE + name;
     }
 
-    public static String generateCacheRedisKey(ObjectId publishId, Integer commentType) {
+    public static String generateCacheRedisKey(ObjectId publishId, Long userId, Integer commentType) {
         String str1 = publishId.toString();
-        String str2 = String.valueOf(commentType);
-        String redisKey = DigestUtils.md5Hex((str1 + str2));
+        String str2 = String.valueOf(userId);
+        String str3 = String.valueOf(commentType);
+        String redisKey = DigestUtils.md5Hex((str1 + "_" + str2 + "_" + str3));
         return redisKey;
     }
 }

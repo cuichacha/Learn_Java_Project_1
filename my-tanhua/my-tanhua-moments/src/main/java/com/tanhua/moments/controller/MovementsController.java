@@ -19,7 +19,7 @@ public class MovementsController {
     private MovementsService movementsService;
 
 
-    @PostMapping()
+    @PostMapping
     public ResponseEntity<Void> publishMoment(@RequestHeader("Authorization") String token,
                                               @RequestParam(value = "textContent", required = false) String textContent,
                                               @RequestParam(value = "location", required = false) String location,
@@ -83,7 +83,7 @@ public class MovementsController {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
     }
 
-    @GetMapping("/{id}/dislove")
+    @GetMapping("/{id}/unlove")
     public ResponseEntity<Long> disLoveComment(@RequestHeader("Authorization") String token,
                                                @PathVariable("id") ObjectId publishId) {
         Long result = movementsService.opposeComment(token, publishId, 3);

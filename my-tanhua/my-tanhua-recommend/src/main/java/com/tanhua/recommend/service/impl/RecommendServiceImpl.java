@@ -1,7 +1,6 @@
 package com.tanhua.recommend.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.tanhua.commons.annotation.Cache;
 import com.tanhua.commons.pojo.recommend.QueryUser;
 import com.tanhua.commons.pojo.recommend.RecommendUser;
 import com.tanhua.commons.pojo.sso.UserInfo;
@@ -69,8 +68,8 @@ public class RecommendServiceImpl implements RecommendService {
         PageRequest pageRequest = PageRequest.of(startPage - 1, pageSize);
 
         // 根据登录用户的ID，去MongoDB中，查询所有推荐给当前用户的用户，即推荐列表
-        Query query = Query.query(Criteria.where("toUserId").is(id)).with(pageRequest)
-                .with(Sort.by(Sort.Order.desc("score")));
+        Query query = Query.query(Criteria.where("toUserId").is(id))
+                .with(Sort.by(Sort.Order.desc("score"))).with(pageRequest);
         List<RecommendUser> recommendUserList = mongoTemplate.find(query, RecommendUser.class);
 
         // 拿到推荐列表中，所有用户的ID，组成ID集合
@@ -118,7 +117,8 @@ public class RecommendServiceImpl implements RecommendService {
         for (UserInfo userInfo : userInfos) {
             // 但是UserInfo表中，没有缘分值相关数据，前台又需要这个数据，需要去MongoDB中查询
             Long userId = userInfo.getUserId();
-            Query idQuery = Query.query(Criteria.where("userId").is(userId));
+            Query idQuery = Query.query(Criteria.where("userId").is(userId)
+                    .andOperator(Criteria.where("toUserId").is(id)));
             RecommendUser recommendUser = mongoTemplate.findOne(idQuery, RecommendUser.class);
             Double score = Math.floor(recommendUser.getScore());
             long value = score.longValue();

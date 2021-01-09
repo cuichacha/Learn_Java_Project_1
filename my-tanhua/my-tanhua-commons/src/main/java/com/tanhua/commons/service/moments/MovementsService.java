@@ -13,7 +13,7 @@ public interface MovementsService {
 
     public abstract MovementsResult queryRecommendedMovements(String token, Integer startPage, Integer pageSize);
 
-    public abstract Long countComment(ObjectId publishId, Integer commentType);
+    public abstract Long countComment(ObjectId publishId, Long userId, Integer commentType);
 
     public abstract Boolean publishMoment(String token, String textContent,
                                           String location, String latitude,
@@ -25,9 +25,11 @@ public interface MovementsService {
 
     public abstract Long opposeComment(String token, ObjectId publishId, Integer commentType);
 
+    public abstract void operateComment(String token, ObjectId publishId, Integer commentType);
+
     public abstract Movements querySingleMovement(String token, ObjectId publishId);
 
-    public abstract void fillPublishToMovements(Movements movements, Publish publish);
+    public abstract void fillPublishToMovements(Movements movements, Publish publish, Long userId);
 
     public abstract void fillUserInfoToMovements(Movements movements, UserInfo userInfo);
 }

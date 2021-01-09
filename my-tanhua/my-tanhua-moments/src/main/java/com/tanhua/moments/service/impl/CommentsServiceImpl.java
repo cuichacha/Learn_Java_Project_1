@@ -12,6 +12,7 @@ import com.tanhua.commons.utils.RedisKeyUtil;
 import com.tanhua.commons.utils.TokenUtil;
 import com.tanhua.commons.vo.moments.MovementsResult;
 import com.tanhua.moments.mapper.UserInfoMapper;
+import org.apache.rocketmq.spring.core.RocketMQTemplate;
 import org.bson.types.ObjectId;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,6 +41,14 @@ public class CommentsServiceImpl implements CommentsService {
 
     @Autowired
     private MovementsService movementsService;
+
+    @Autowired
+    private RocketMQTemplate rocketMQTemplate;
+
+    private String commentLikeRedisKey;
+
+    private ObjectId objectId;
+
 
     // 查询评论列表
     @Override
@@ -72,25 +81,26 @@ public class CommentsServiceImpl implements CommentsService {
                     movementComment.setContent(comment.getContent());
                     movementComment.setCreateDate(new DateTime(comment.getCreated()).toString("yyyy年MM月dd日 HH:mm"));
 
-                    // 去Redis中，查询缓存的评论点赞数量
-                    String commentLikeRedisKey = RedisKeyUtil.generateCacheRedisKey(movementPublishId, 1)
+                    commentLikeRedisKey = RedisKeyUtil.generateCacheRedisKey(movementPublishId, comment.getUserId(), 1)
                             + "_" + RedisKey.COMMENT_LIKE_CACHE;
+
+                    // 有无点赞
+                    Boolean isLiked = redisTemplate.hasKey(commentLikeRedisKey);
+                    if (isLiked != null) {
+                        movementComment.setHasLiked(isLiked ? 1 : 0); //是否点赞（1是，0否）
+                    }
+
+                    // 去Redis中，查询缓存的评论点赞数量
                     String commentLikeValue = redisTemplate.opsForValue().get(commentLikeRedisKey);
 
                     // 没有的话，去表中查询，查询完后，会存入缓存
                     if (commentLikeValue != null) {
                         movementComment.setLikeCount(Integer.valueOf(commentLikeValue));
                     } else {
-                        Long commentLikes = queryCommentLike(movementPublishId);
+                        Long commentLikes = queryCommentLike(movementPublishId, comment.getUserId());
                         movementComment.setLikeCount(commentLikes.intValue());
                     }
 
-                    // 有无点赞
-                    Boolean isLiked = redisTemplate.hasKey(commentLikeRedisKey);
-                    if (isLiked != null) {
-                        movementComment.setHasLiked(isLiked ? 1 : 0); //是否点赞（1是，0否）
-
-                    }
                     movementCommentList.add(movementComment);
                 }
             }
@@ -105,9 +115,9 @@ public class CommentsServiceImpl implements CommentsService {
     }
 
 
-    // 查询评论点赞数点赞
+    // 查询评论点赞数
     @Override
-    public Long queryCommentLike(ObjectId movementPublishId) {
+    public Long queryCommentLike(ObjectId movementPublishId, Long userId) {
         // 根据动态ID查询所有评论
         Query movementQuery = Query.query(Criteria.where("publishId").is(movementPublishId));
         List<Comment> comments = mongoTemplate.find(movementQuery, Comment.class, "quanzi_comment");
@@ -119,16 +129,8 @@ public class CommentsServiceImpl implements CommentsService {
         }
         // 将评论ID作为publishID，结合评论类型-->1（点赞），去查询（计算）到所有评论的点赞评论数量
         Query commentQuery = Query.query(Criteria.where("publishId").in(commentLikeIds));
-        long commentLikes = mongoTemplate.count(commentQuery, Comment.class, "quanzi_comment");
 
-        if (commentLikes != 0) {
-            // 将评论点赞数量，存入Redis
-            String commentLikeRedisKey = RedisKeyUtil.generateCacheRedisKey(movementPublishId, 1)
-                    + "_" + RedisKey.COMMENT_LIKE_CACHE;
-            redisTemplate.opsForValue().set(commentLikeRedisKey, String.valueOf(commentLikes), 60, TimeUnit.SECONDS);
-            return commentLikes;
-        }
-        return null;
+        return mongoTemplate.count(commentQuery, Comment.class, "quanzi_comment");
     }
 
     @Override
@@ -152,13 +154,40 @@ public class CommentsServiceImpl implements CommentsService {
     }
 
     @Override
-    public Long likeComment(String toke, ObjectId publishId) {
-        return movementsService.supportComment(toke, publishId, 1);
+    public Long likeComment(String token, ObjectId publishId) {
+        operateComment(token, publishId);
+        Long increment = redisTemplate.opsForValue().increment(commentLikeRedisKey);
+        Comment comment = movementsService.getComment(publishId, TokenUtil.parseToken2Id(token), 1, null);
+        objectId = comment.getId();
+        rocketMQTemplate.convertAndSend("addComment", comment);
+        return increment;
     }
 
     @Override
-    public Long disLikeComment(String toke, ObjectId publishId) {
-        return movementsService.opposeComment(toke, publishId, 1);
+    public Long disLikeComment(String token, ObjectId publishId) {
+        operateComment(token, publishId);
+        Long decrement = redisTemplate.opsForValue().decrement(commentLikeRedisKey);
+        Comment comment = movementsService.getComment(publishId, TokenUtil.parseToken2Id(token), 1, null);
+        comment.setId(objectId);
+        rocketMQTemplate.convertAndSend("removeComment", comment);
+        if (decrement < 0) {
+            decrement = 0L;
+        }
+        return decrement;
+    }
+
+    @Override
+    public void operateComment(String token, ObjectId publishId) {
+        // 根据token查询当前登录用户ID
+        Long userId = TokenUtil.parseToken2Id(token);
+
+        String likeValue = redisTemplate.opsForValue().get(commentLikeRedisKey);
+        // 如果没查到数据，说明没有之前没有点赞
+        if (likeValue == null) {
+            // 获取已点赞数，写入Redis，返回数据
+            Long likeNumber = queryCommentLike(publishId, userId);
+            redisTemplate.opsForValue().set(commentLikeRedisKey, String.valueOf(likeNumber));
+        }
     }
 
 

@@ -8,6 +8,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 @RestController
 @RequestMapping("/comments")
 public class CommentsController {
@@ -27,8 +29,10 @@ public class CommentsController {
 
     @PostMapping
     public ResponseEntity<Void> publishComment(@RequestHeader("Authorization") String token,
-                                               @RequestParam("movementId") ObjectId movementPublishId,
-                                               @RequestParam("comment") String content) {
+                                               @RequestBody Map<String,String> param) {
+        String publishId = param.get("movementId");
+        ObjectId movementPublishId = new ObjectId(publishId);
+        String content = param.get("comment");
         Boolean result = commentsService.publishComment(token, movementPublishId, content);
         if (result) {
             return ResponseEntity.ok(null);
