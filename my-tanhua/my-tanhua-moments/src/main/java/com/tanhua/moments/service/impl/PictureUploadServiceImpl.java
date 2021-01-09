@@ -14,6 +14,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
 @Service
+@com.alibaba.dubbo.config.annotation.Service
 public class PictureUploadServiceImpl implements PictureUploadService {
 
     @Autowired

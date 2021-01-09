@@ -1,9 +1,11 @@
 package com.tanhua.commons.pojo.moments;
 
 import org.bson.types.ObjectId;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.io.Serializable;
 
+@Document(collection = "quanzi_comment")
 public class Comment implements Serializable {
     private static final long serialVersionUID = -291788258125767614L;
 

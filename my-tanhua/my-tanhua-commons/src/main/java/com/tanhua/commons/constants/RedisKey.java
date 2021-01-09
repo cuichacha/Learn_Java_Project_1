@@ -8,4 +8,6 @@ public class RedisKey {
     public static final String MOVEMENT_LIKE_CACHE = "movement_like_cache";
     public static final String MOVEMENT_LOVE_CACHE = "movement_love_cache";
     public static final String COMMENT_LIKE_CACHE = "comment_like_cache";
+
+    public static final String SUBSCRIBE = "subscribe";
 }

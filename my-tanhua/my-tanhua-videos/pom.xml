@@ -9,7 +9,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>my-tanhua-moments</artifactId>
+    <artifactId>my-tanhua-videos</artifactId>
 
     <properties>
         <maven.compiler.source>8</maven.compiler.source>

@@ -1,9 +1,11 @@
 package com.tanhua.commons.pojo.moments;
 
 import org.bson.types.ObjectId;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.io.Serializable;
 
+@Document(collection = "tanhua_users")
 public class Users implements Serializable {
 
     private static final long serialVersionUID = 6003135946820874230L;

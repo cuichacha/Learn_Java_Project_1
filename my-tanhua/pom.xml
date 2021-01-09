@@ -9,6 +9,7 @@
         <module>my-tanhua-commons</module>
         <module>my-tanhua-recommend</module>
         <module>my-tanhua-moments</module>
+        <module>my-tanhua-videos</module>
     </modules>
 
     <parent>

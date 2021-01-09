@@ -27,6 +27,7 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 @Service
+@com.alibaba.dubbo.config.annotation.Service
 public class MovementsServiceImpl implements MovementsService {
 
     @Autowired
@@ -77,7 +78,7 @@ public class MovementsServiceImpl implements MovementsService {
         List<UserInfo> userInfos = userInfoMapper.selectList(queryWrapper);
         // 构建查询动态信息的条件，从发布表中查询动态信息
         Query publishQuery = Query.query(Criteria.where("_id").in(publishIdList)).with(Sort.by(Sort.Order.desc("created")));
-        List<Publish> publishList = mongoTemplate.find(publishQuery, Publish.class, "quanzi_publish");
+        List<Publish> publishList = mongoTemplate.find(publishQuery, Publish.class);
 
         List<Movements> movementsList = new ArrayList<>();
 
@@ -160,8 +161,6 @@ public class MovementsServiceImpl implements MovementsService {
         Long userId = TokenUtil.parseToken2Id(token);
         String id = String.valueOf(userId);
 
-        String publishTable = "quanzi_publish";
-
         Publish publish = new Publish();
         publish.setUserId(userId);
         publish.setText(textContent);
@@ -174,7 +173,7 @@ public class MovementsServiceImpl implements MovementsService {
         publish.setCreated(System.currentTimeMillis());
         // 先向发布表中插入一条数据
         try {
-            mongoTemplate.insert(publish, publishTable);
+            mongoTemplate.insert(publish);
         } catch (Exception e) {
             e.printStackTrace();
             return false;
@@ -195,7 +194,7 @@ public class MovementsServiceImpl implements MovementsService {
         }
         // 查询好友表，获得所有好友ID，向所有的好友时间线表中插入一条数据
         Query query = Query.query(Criteria.where("userId").is(userId));
-        List<Users> users = mongoTemplate.find(query, Users.class, "tanhua_users");
+        List<Users> users = mongoTemplate.find(query, Users.class);
         for (Users user : users) {
             Long userUserId = user.getUserId();
             String timeLineUserId = String.valueOf(userUserId);
@@ -219,7 +218,7 @@ public class MovementsServiceImpl implements MovementsService {
 
     // 点赞 / 喜欢
     @Override
-    public Long supportComment(String token, ObjectId publishId, Integer commentType) {
+    public Long supportMovement(String token, ObjectId publishId, Integer commentType) {
 
         operateComment(token, publishId, commentType);
 
@@ -262,7 +261,7 @@ public class MovementsServiceImpl implements MovementsService {
         comment.setUserId(userId);
         comment.setContent(content);
         Query query = Query.query(Criteria.where("_id").is(publishId));
-        Publish publish = mongoTemplate.findOne(query, Publish.class, "quanzi_publish");
+        Publish publish = mongoTemplate.findOne(query, Publish.class);
         if (publish != null) {
             Long publishUserId = publish.getUserId();
             comment.setPublishUserId(publishUserId);
@@ -272,7 +271,7 @@ public class MovementsServiceImpl implements MovementsService {
 
     // 取消点赞 / 取消喜欢
     @Override
-    public Long opposeComment(String token, ObjectId publishId, Integer commentType) {
+    public Long opposeMovement(String token, ObjectId publishId, Integer commentType) {
 
         operateComment(token, publishId, commentType);
 
@@ -345,7 +344,7 @@ public class MovementsServiceImpl implements MovementsService {
         // 查询单个动态，便于后续的评论操作
         Movements movements = new Movements();
         Query publishQuery = Query.query(Criteria.where("_id").is(publishId));
-        Publish publish = mongoTemplate.findOne(publishQuery, Publish.class, "quanzi_publish");
+        Publish publish = mongoTemplate.findOne(publishQuery, Publish.class);
         if (publish != null) {
             fillPublishToMovements(movements, publish, TokenUtil.parseToken2Id(token));
 

@@ -54,9 +54,9 @@ public class MovementsController {
 
 
     @GetMapping("/{id}/like")
-    public ResponseEntity<Long> likeComment(@RequestHeader("Authorization") String token,
+    public ResponseEntity<Long> likeMovement(@RequestHeader("Authorization") String token,
                                             @PathVariable("id") ObjectId publishId) {
-        Long result = movementsService.supportComment(token, publishId, 1);
+        Long result = movementsService.supportMovement(token, publishId, 1);
         if (result != null) {
             return ResponseEntity.ok(result);
         }
@@ -64,9 +64,9 @@ public class MovementsController {
     }
 
     @GetMapping("/{id}/dislike")
-    public ResponseEntity<Long> disLikeComment(@RequestHeader("Authorization") String token,
+    public ResponseEntity<Long> disLikeMovement(@RequestHeader("Authorization") String token,
                                             @PathVariable("id") ObjectId publishId) {
-        Long result = movementsService.opposeComment(token, publishId, 1);
+        Long result = movementsService.opposeMovement(token, publishId, 1);
         if (result != null) {
             return ResponseEntity.ok(result);
         }
@@ -74,9 +74,9 @@ public class MovementsController {
     }
 
     @GetMapping("/{id}/love")
-    public ResponseEntity<Long> loveComment(@RequestHeader("Authorization") String token,
+    public ResponseEntity<Long> loveMovement(@RequestHeader("Authorization") String token,
                                             @PathVariable("id") ObjectId publishId) {
-        Long result = movementsService.supportComment(token, publishId, 3);
+        Long result = movementsService.supportMovement(token, publishId, 3);
         if (result != null) {
             return ResponseEntity.ok(result);
         }
@@ -84,9 +84,9 @@ public class MovementsController {
     }
 
     @GetMapping("/{id}/unlove")
-    public ResponseEntity<Long> disLoveComment(@RequestHeader("Authorization") String token,
+    public ResponseEntity<Long> disLoveMovement(@RequestHeader("Authorization") String token,
                                                @PathVariable("id") ObjectId publishId) {
-        Long result = movementsService.opposeComment(token, publishId, 3);
+        Long result = movementsService.opposeMovement(token, publishId, 3);
         if (result != null) {
             return ResponseEntity.ok(result);
         }

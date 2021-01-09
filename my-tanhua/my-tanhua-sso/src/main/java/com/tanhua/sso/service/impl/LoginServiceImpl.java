@@ -139,7 +139,7 @@ public class LoginServiceImpl implements LoginService {
 //        userInfo.setUserId(id);
         userInfo.setLogo(avatarUrl);
         userInfo.setCoverPic(avatarUrl);
-        QueryWrapper<UserInfo> wrapper = new QueryWrapper();
+        QueryWrapper<UserInfo> wrapper = new QueryWrapper<>();
         wrapper.eq("user_id", id);
         int result = userInfoMapper.update(userInfo, wrapper);
 

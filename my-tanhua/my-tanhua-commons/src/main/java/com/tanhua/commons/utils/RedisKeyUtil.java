@@ -32,4 +32,10 @@ public class RedisKeyUtil {
         String redisKey = DigestUtils.md5Hex((str1 + "_" + str2 + "_" + str3));
         return redisKey;
     }
+
+    public static String generateCacheRedisKey(Long userId) {
+        String str = String.valueOf(userId);
+        String redisKey = DigestUtils.md5Hex(str);
+        return redisKey;
+    }
 }

@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 @Service
+@com.alibaba.dubbo.config.annotation.Service
 public class CommentsServiceImpl implements CommentsService {
 
     @Autowired

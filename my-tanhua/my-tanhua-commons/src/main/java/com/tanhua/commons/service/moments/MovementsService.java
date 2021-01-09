@@ -19,11 +19,11 @@ public interface MovementsService {
                                           String location, String latitude,
                                           String longitude, MultipartFile[] multipartFile);
 
-    public abstract Long supportComment(String token, ObjectId publishId, Integer commentType);
+    public abstract Long supportMovement(String token, ObjectId publishId, Integer commentType);
 
     public abstract Comment getComment(ObjectId publishId, Long userId, Integer commentType, String content);
 
-    public abstract Long opposeComment(String token, ObjectId publishId, Integer commentType);
+    public abstract Long opposeMovement(String token, ObjectId publishId, Integer commentType);
 
     public abstract void operateComment(String token, ObjectId publishId, Integer commentType);
 
