@@ -1,4 +1,4 @@
-package com.tanhua.commons.pojo.message;
+package com.tanhua.commons.pojo.messages;
 
 import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.core.mapping.Document;

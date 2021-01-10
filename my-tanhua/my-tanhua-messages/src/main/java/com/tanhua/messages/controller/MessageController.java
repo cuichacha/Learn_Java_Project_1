@@ -1,6 +1,7 @@
 package com.tanhua.messages.controller;
 
-import com.tanhua.commons.service.message.MessageService;
+import com.tanhua.commons.service.messages.MessageService;
+import com.tanhua.commons.vo.messages.MessageResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,5 +28,50 @@ public class MessageController {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
     }
 
+    @GetMapping("/contacts")
+    public ResponseEntity<MessageResult> queryContactsList(@RequestHeader("Authorization") String token,
+                                                           @RequestParam(value = "page", defaultValue = "1") Integer startPage,
+                                                           @RequestParam(value = "pagesize", defaultValue = "10") Integer pageSize,
+                                                           @RequestParam(value = "keyword", required = false) String keyword) {
+
+        MessageResult messageResult = messageService.queryContactsLists(token, startPage, pageSize, keyword);
+        return ResponseEntity.ok(messageResult);
+    }
+
+    @GetMapping("/likes")
+    public ResponseEntity<MessageResult> queryMessageLikeList(@RequestHeader("Authorization") String token,
+                                                              @RequestParam(value = "page", defaultValue = "1") Integer startPage,
+                                                              @RequestParam(value = "pagesize", defaultValue = "10") Integer pageSize) {
+
+        MessageResult messageResult = messageService.queryComments(token, startPage, pageSize, 1);
+        return ResponseEntity.ok(messageResult);
+    }
+
+    @GetMapping("/comments")
+    public ResponseEntity<MessageResult> queryMessageCommentList(@RequestHeader("Authorization") String token,
+                                                              @RequestParam(value = "page", defaultValue = "1") Integer startPage,
+                                                              @RequestParam(value = "pagesize", defaultValue = "10") Integer pageSize) {
+
+        MessageResult messageResult = messageService.queryComments(token, startPage, pageSize, 2);
+        return ResponseEntity.ok(messageResult);
+    }
+
+    @GetMapping("/loves")
+    public ResponseEntity<MessageResult> queryMessageLoveList(@RequestHeader("Authorization") String token,
+                                                              @RequestParam(value = "page", defaultValue = "1") Integer startPage,
+                                                              @RequestParam(value = "pagesize", defaultValue = "10") Integer pageSize) {
+
+        MessageResult messageResult = messageService.queryComments(token, startPage, pageSize, 3);
+        return ResponseEntity.ok(messageResult);
+    }
+
+    @GetMapping("announcements")
+    public ResponseEntity<MessageResult> queryAnnouncement(@RequestHeader("Authorization") String token,
+                                                              @RequestParam(value = "page", defaultValue = "1") Integer startPage,
+                                                              @RequestParam(value = "pagesize", defaultValue = "10") Integer pageSize) {
+
+        MessageResult messageResult = messageService.queryComments(token, startPage, pageSize, 3);
+        return ResponseEntity.ok(messageResult);
+    }
 
 }
