@@ -1,6 +1,7 @@
 package com.tanhua.recommend;
 
 import com.tanhua.commons.config.AliyunConfig;
+import com.tanhua.commons.config.HuanXinConfig;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -13,7 +14,7 @@ import org.springframework.context.annotation.FilterType;
         "com.tanhua.commons.interceptor",
         "com.tanhua.commons.config"},
         excludeFilters = {@ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE,
-                classes = {AliyunConfig.class})})
+                classes = {AliyunConfig.class, HuanXinConfig.class})})
 public class RecommendApplication {
     public static void main(String[] args) {
         SpringApplication.run(RecommendApplication.class, args);

@@ -10,4 +10,6 @@ public class RedisKey {
     public static final String COMMENT_LIKE_CACHE = "comment_like_cache";
 
     public static final String SUBSCRIBE = "subscribe";
+
+    public static final String HUANXIN = "huanxin_token";
 }
