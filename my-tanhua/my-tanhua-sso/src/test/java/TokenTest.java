@@ -94,8 +94,8 @@ public class TokenTest {
     // {duration=85, path=/users, application=87fcf067-fda6-48a1-b428-6309b4a1728f, entities=[{"created":1610255105121,"modified":1610255105121,"type":"user","uuid":"66e2bba0-5301-11eb-9372-27024c5eae94","username":"95","activated":true}], organization=1116210104148369, action=post, uri=https://a1.easemob.com/1116210104148369/test/users, applicationName=test, timestamp=1610255105079}
     // {"path":"/users","uri":"https://a1.easemob.com/1116210104148369/test/users","timestamp":1610255237973,"organization":"1116210104148369","application":"87fcf067-fda6-48a1-b428-6309b4a1728f","entities":[{"uuid":"b615d950-5301-11eb-b309-1b46121a9c68","type":"user","created":1610255237996,"modified":1610255237996,"username":"95","activated":true}],"action":"post","duration":67,"applicationName":"test"}
 
-    @Test
-    public void test9() {
-        System.out.println(DigestUtils.md5Hex(String.valueOf(2)));
-    }
+//    @Test
+//    public void test9() {
+//        System.out.println(DigestUtils.md5Hex(String.valueOf(2)));
+//    }
 }

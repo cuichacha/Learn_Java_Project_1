@@ -39,6 +39,7 @@ public class HuanXinService {
 
         // 注册用户放入请求体中
         HuanXinUser huanXinUser = new HuanXinUser(String.valueOf(userId), DigestUtils.md5Hex(String.valueOf(userId)));
+//        HuanXinUser huanXinUser = new HuanXinUser(String.valueOf(userId), String.valueOf(userId));
         String body = JSON.toJSONString(Collections.singletonList(huanXinUser));
         HttpEntity<String> httpEntity = new HttpEntity<>(body, headers);
 

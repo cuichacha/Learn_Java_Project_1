@@ -17,9 +17,8 @@ public class HuanXinController {
     public ResponseEntity<HuanXinUser> queryHuanXinUser(@RequestHeader("Authorization") String token) {
         Long userId = TokenUtil.parseToken2Id(token);
 
-        HuanXinUser huanXinUser = new HuanXinUser();
-        huanXinUser.setUsername(userId.toString());
-        huanXinUser.setPassword(DigestUtils.md5Hex(String.valueOf(userId)));
+//        HuanXinUser huanXinUser = new HuanXinUser(String.valueOf(userId), String.valueOf(userId));
+        HuanXinUser huanXinUser = new HuanXinUser(String.valueOf(userId), DigestUtils.md5Hex(String.valueOf(userId)));
 
         return ResponseEntity.ok(huanXinUser);
     }
