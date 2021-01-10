@@ -1,8 +1,9 @@
-package com.tanhua.sso.service.huanxin;
+package com.tanhua.messages.service.huanxin;
 
 import com.alibaba.fastjson.JSON;
 import com.tanhua.commons.config.HuanXinConfig;
 import com.tanhua.commons.constants.RedisKey;
+import com.tanhua.commons.service.huaxin.HuanXinTokenService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -14,7 +15,8 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 @Service
-public class HuanXinTokenService {
+@com.alibaba.dubbo.config.annotation.Service
+public class HuanXinTokenServiceImpl implements HuanXinTokenService {
 
     @Autowired
     private RestTemplate restTemplate;

@@ -2,6 +2,7 @@ package com.tanhua.sso;
 
 import com.tanhua.commons.config.AliyunConfig;
 import com.tanhua.commons.config.CacheInterceptorConfig;
+import com.tanhua.commons.config.HuanXinConfig;
 import com.tanhua.commons.config.InterceptorConfig;
 import com.tanhua.commons.interceptor.CacheInterceptor;
 import com.tanhua.commons.interceptor.MyResponseBodyAdvice;
@@ -23,19 +24,12 @@ import org.springframework.web.client.RestTemplate;
         "com.tanhua.commons.config",
         "com.tanhua.commons.interceptor"},
         excludeFilters = {@ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE,
-                classes = {CacheInterceptorConfig.class, CacheInterceptor.class, MyResponseBodyAdvice.class})})
+                classes = {CacheInterceptorConfig.class, CacheInterceptor.class,
+                        MyResponseBodyAdvice.class, HuanXinConfig.class})})
 public class SSOApplication {
-
-    @Autowired
-    private RestTemplateBuilder builder;
 
     public static void main(String[] args) {
         SpringApplication.run(SSOApplication.class, args);
-    }
-
-    @Bean
-    public RestTemplate restTemplate() {
-        return builder.build();
     }
 
 }

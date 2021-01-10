@@ -1,8 +1,6 @@
 import com.alibaba.fastjson.JSON;
 import com.tanhua.commons.constants.RedisKey;
 import com.tanhua.sso.SSOApplication;
-import com.tanhua.sso.service.huanxin.HuanXinService;
-import com.tanhua.sso.service.huanxin.HuanXinTokenService;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;

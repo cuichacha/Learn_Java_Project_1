@@ -1,4 +1,4 @@
-package com.tanhua.sso.controller;
+package com.tanhua.messages.controller;
 
 import com.tanhua.commons.pojo.huaxin.HuanXinUser;
 import com.tanhua.commons.utils.TokenUtil;

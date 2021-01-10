@@ -1,8 +1,10 @@
-package com.tanhua.sso.service.huanxin;
+package com.tanhua.messages.service.huanxin;
 
 import com.alibaba.fastjson.JSON;
 import com.tanhua.commons.config.HuanXinConfig;
 import com.tanhua.commons.pojo.huaxin.HuanXinUser;
+import com.tanhua.commons.service.huaxin.HuanXinService;
+import com.tanhua.commons.service.huaxin.HuanXinTokenService;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
@@ -13,7 +15,8 @@ import org.springframework.web.client.RestTemplate;
 import java.util.Collections;
 
 @Service
-public class HuanXinService {
+@com.alibaba.dubbo.config.annotation.Service
+public class HuanXinServiceImpl implements HuanXinService {
 
     @Autowired
     private HuanXinTokenService huanXinTokenService;
@@ -50,9 +53,24 @@ public class HuanXinService {
     }
 
 
-    public Boolean addFriend() {
+    public Boolean addFriend(Long loginUserId, Long friendUserId) {
+        // 拼接请求路径，从Redis中获取环信token
+        String huanXinToken = huanXinTokenService.takeHuanXinToken();
+        String url = huanXinConfig.getUrl();
+        String orgName = huanXinConfig.getOrgName();
+        String appName = huanXinConfig.getAppName();
+        String loginUserName = String.valueOf(loginUserId);
+        String friendUserName = String.valueOf(friendUserId);
+        String targetUrl = url + orgName + "/" + appName + "/users/" + loginUserName + "/contacts/users/" + friendUserName;
 
+        // 请求头
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Content-Type", "application/json");
+        headers.add("Authorization", "Bearer " + huanXinToken);
+        HttpEntity<String> httpEntity = new HttpEntity<>(headers);
+        // 发送请求
+        String response = restTemplate.postForObject(targetUrl, httpEntity, String.class);
 
-        return null;
+        return response != null;
     }
 }

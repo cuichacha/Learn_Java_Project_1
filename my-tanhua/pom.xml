@@ -10,6 +10,7 @@
         <module>my-tanhua-recommend</module>
         <module>my-tanhua-moments</module>
         <module>my-tanhua-videos</module>
+        <module>my-tanhua-messages</module>
     </modules>
 
     <parent>

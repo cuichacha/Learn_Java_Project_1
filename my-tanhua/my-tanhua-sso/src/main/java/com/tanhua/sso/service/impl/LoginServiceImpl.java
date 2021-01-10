@@ -1,13 +1,14 @@
 package com.tanhua.sso.service.impl;
 
+import com.alibaba.dubbo.config.annotation.Reference;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.tanhua.commons.constants.RedisKey;
 import com.tanhua.commons.enums.SexEnum;
+import com.tanhua.commons.service.huaxin.HuanXinService;
 import com.tanhua.commons.vo.sso.ErrorResult;
 import com.tanhua.sso.mapper.UserInfoMapper;
 import com.tanhua.sso.mapper.UserMapper;
 
-import com.tanhua.sso.service.huanxin.HuanXinService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -38,7 +39,7 @@ public class LoginServiceImpl implements LoginService {
     @Autowired
     private UserInfoMapper userInfoMapper;
 
-    @Autowired
+    @Reference
     private HuanXinService huanXinService;
 
     @Value("${jwt.secret}")
