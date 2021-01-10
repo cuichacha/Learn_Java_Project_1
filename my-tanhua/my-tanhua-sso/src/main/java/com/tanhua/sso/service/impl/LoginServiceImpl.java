@@ -7,6 +7,7 @@ import com.tanhua.commons.vo.sso.ErrorResult;
 import com.tanhua.sso.mapper.UserInfoMapper;
 import com.tanhua.sso.mapper.UserMapper;
 
+import com.tanhua.sso.service.huanxin.HuanXinService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -36,6 +37,9 @@ public class LoginServiceImpl implements LoginService {
 
     @Autowired
     private UserInfoMapper userInfoMapper;
+
+    @Autowired
+    private HuanXinService huanXinService;
 
     @Value("${jwt.secret}")
     private String secret;
@@ -79,6 +83,10 @@ public class LoginServiceImpl implements LoginService {
                 User newUser = new User();
                 newUser.setMobile(phone);
                 addUser(newUser);
+                // 对新用户进行环信的注册
+                User user = findUserByPhone(phone);
+                Long userId = user.getId();
+                huanXinService.registerUser(userId);
             }
             // 老用户，返回token，返回Json字符串，继续业务
             User user = findUserByPhone(phone);

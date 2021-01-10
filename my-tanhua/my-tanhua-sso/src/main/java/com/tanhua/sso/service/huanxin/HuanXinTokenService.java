@@ -26,6 +26,7 @@ public class HuanXinTokenService {
     private RedisTemplate<String, String> redisTemplate;
 
     public String getHuanXinToken() {
+        // 拼接请求路径
         String url = huanXinConfig.getUrl();
         String orgName = huanXinConfig.getOrgName();
         String appName = huanXinConfig.getAppName();
@@ -33,23 +34,22 @@ public class HuanXinTokenService {
         String clientSecret = huanXinConfig.getClientSecret();
 
         String targetUrl = url + orgName + "/" + appName + "/token";
+        // 将必要信息放入请求体
         Map<String, String> param = new HashMap<>();
         param.put("grant_type", "client_credentials");
         param.put("client_id", clientId);
         param.put("client_secret", clientSecret);
-
+        // 发送请求
         String response = restTemplate.postForObject(targetUrl, param, String.class);
+        // 解析相应体，获取token和过期时间
         Map parseObject = JSON.parseObject(response, Map.class);
         String access_token = (String) parseObject.get("access_token");
 //        String application = (String) parseObject.get("application");
         Long expires_in = (Long) parseObject.get("expires_in");
-
+        // 将token存入Redis中
         String redisKey = RedisKey.HUANXIN;
         redisTemplate.opsForValue().set(redisKey, access_token, (expires_in - 36000), TimeUnit.SECONDS);
-        if (access_token != null) {
-            return access_token;
-        }
-        return null;
+        return access_token;
     }
 
     public String takeHuanXinToken() {

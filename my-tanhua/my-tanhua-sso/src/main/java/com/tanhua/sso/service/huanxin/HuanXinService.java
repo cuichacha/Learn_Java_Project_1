@@ -10,7 +10,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.Arrays;
+import java.util.Collections;
 
 @Service
 public class HuanXinService {
@@ -39,7 +39,7 @@ public class HuanXinService {
 
         // 注册用户放入请求体中
         HuanXinUser huanXinUser = new HuanXinUser(String.valueOf(userId), DigestUtils.md5Hex(String.valueOf(userId)));
-        String body = JSON.toJSONString(Arrays.asList(huanXinUser));
+        String body = JSON.toJSONString(Collections.singletonList(huanXinUser));
         HttpEntity<String> httpEntity = new HttpEntity<>(body, headers);
 
         // 发送请求
