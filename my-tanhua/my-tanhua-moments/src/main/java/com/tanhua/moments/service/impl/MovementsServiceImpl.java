@@ -243,6 +243,7 @@ public class MovementsServiceImpl implements MovementsService {
         // 通过MQ发送消息，进行MongoDB表的增加或者删除
         Comment comment = getComment(publishId, TokenUtil.parseToken2Id(token), commentType, null);
         objectId = comment.getId();
+        incrementPid(publishId.toHexString());
         rocketMQTemplate.convertAndSend("addComment", comment);
 
         return increment;
@@ -298,6 +299,7 @@ public class MovementsServiceImpl implements MovementsService {
         // 通过MQ发送消息，进行MongoDB表的增加或者删除
         Comment comment = getComment(publishId, TokenUtil.parseToken2Id(token), commentType, null);
         comment.setId(objectId);
+        incrementPid(publishId.toHexString());
         rocketMQTemplate.convertAndSend("removeComment", comment);
 
         return decrement;
@@ -416,7 +418,8 @@ public class MovementsServiceImpl implements MovementsService {
 
     @Override
     public Long incrementPid(String publishId) {
-        String hashKey = RedisKey.PID_HASH;
+//        String hashKey = RedisKey.PID_HASH;
+        String hashKey = "TANHUA_ID_HASH_" + "1";
         Boolean hasKey = redisTemplate.opsForHash().hasKey(hashKey, publishId);
         if (hasKey) {
             Object increment = redisTemplate.opsForHash().get(hashKey, publishId);
@@ -425,6 +428,7 @@ public class MovementsServiceImpl implements MovementsService {
             }
         }
         String redisKey = RedisKey.MOVEMENT_PID;
+//        String redisKey = "TANHUA_ID_" + "1";
         Long increment = redisTemplate.opsForValue().increment(redisKey);
         if (increment!= null) {
             redisTemplate.opsForHash().put(hashKey, publishId, increment.toString());

@@ -1,5 +1,6 @@
 package com.tanhua.moments.consumer;
 
+import com.tanhua.commons.constants.RedisKey;
 import com.tanhua.commons.pojo.moments.Comment;
 import com.tanhua.commons.pojo.recommend.RecommendMoment;
 import org.apache.rocketmq.spring.annotation.RocketMQMessageListener;
@@ -9,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -18,6 +20,8 @@ public class RemoveCommentConsumer implements RocketMQListener<Comment> {
     @Autowired
     private MongoTemplate mongoTemplate;
 
+    @Autowired
+    private RedisTemplate redisTemplate;
 
     @Override
     public void onMessage(Comment comment) {
@@ -30,7 +34,11 @@ public class RemoveCommentConsumer implements RocketMQListener<Comment> {
         Integer commentType = comment.getCommentType();
         RecommendMoment recommendMoment = new RecommendMoment();
         recommendMoment.setId(ObjectId.get());
-        recommendMoment.setPublishId(Long.valueOf(publishId));
+        String hashKey = RedisKey.PID_HASH;
+        String pid = (String) redisTemplate.opsForHash().get(hashKey, publishId);
+        if (pid != null) {
+            recommendMoment.setPublishId(Long.valueOf(pid));
+        }
         recommendMoment.setUserId(userId);
         recommendMoment.setDate(System.currentTimeMillis());
         Double score = 0.0;
