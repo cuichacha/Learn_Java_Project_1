@@ -111,6 +111,16 @@ public class MovementsServiceImpl implements MovementsService {
 
     @Override
     public MovementsResult queryRecommendedMovements(String token, Integer startPage, Integer pageSize) {
+        Long userId = TokenUtil.parseToken2Id(token);
+        String tableName = "QUANZI_PUBLISH_RECOMMEND_" + userId;
+        String pidValue = redisTemplate.opsForValue().get(tableName);
+        if (pidValue != null) {
+            String[] pids = pidValue.split(",");
+            List<String> publishIds = new ArrayList<>();
+            for (String pid : pids) {
+
+            }
+        }
         return null;
     }
 
