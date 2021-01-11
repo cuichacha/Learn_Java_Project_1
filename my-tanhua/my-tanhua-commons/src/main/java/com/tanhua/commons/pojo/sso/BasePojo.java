@@ -15,4 +15,40 @@ public abstract class BasePojo implements Serializable {
 
     @TableField(fill = FieldFill.INSERT_UPDATE)
     private Date updated;
+
+    public BasePojo() {
+    }
+
+    public BasePojo(Date created, Date updated) {
+        this.created = created;
+        this.updated = updated;
+    }
+
+    public static long getSerialVersionUID() {
+        return serialVersionUID;
+    }
+
+    public Date getCreated() {
+        return created;
+    }
+
+    public void setCreated(Date created) {
+        this.created = created;
+    }
+
+    public Date getUpdated() {
+        return updated;
+    }
+
+    public void setUpdated(Date updated) {
+        this.updated = updated;
+    }
+
+    @Override
+    public String toString() {
+        return "BasePojo{" +
+                "created=" + created +
+                ", updated=" + updated +
+                '}';
+    }
 }

@@ -49,8 +49,8 @@ public class MessageController {
 
     @GetMapping("/comments")
     public ResponseEntity<MessageResult> queryMessageCommentList(@RequestHeader("Authorization") String token,
-                                                              @RequestParam(value = "page", defaultValue = "1") Integer startPage,
-                                                              @RequestParam(value = "pagesize", defaultValue = "10") Integer pageSize) {
+                                                                 @RequestParam(value = "page", defaultValue = "1") Integer startPage,
+                                                                 @RequestParam(value = "pagesize", defaultValue = "10") Integer pageSize) {
 
         MessageResult messageResult = messageService.queryComments(token, startPage, pageSize, 2);
         return ResponseEntity.ok(messageResult);
@@ -65,12 +65,12 @@ public class MessageController {
         return ResponseEntity.ok(messageResult);
     }
 
-    @GetMapping("announcements")
+    @GetMapping("/announcements")
     public ResponseEntity<MessageResult> queryAnnouncement(@RequestHeader("Authorization") String token,
-                                                              @RequestParam(value = "page", defaultValue = "1") Integer startPage,
-                                                              @RequestParam(value = "pagesize", defaultValue = "10") Integer pageSize) {
+                                                           @RequestParam(value = "page", defaultValue = "1") Integer startPage,
+                                                           @RequestParam(value = "pagesize", defaultValue = "10") Integer pageSize) {
 
-        MessageResult messageResult = messageService.queryComments(token, startPage, pageSize, 3);
+        MessageResult messageResult = messageService.queryAnnouncement(token, startPage, pageSize);
         return ResponseEntity.ok(messageResult);
     }
 

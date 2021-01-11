@@ -4,10 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.tanhua.commons.pojo.messages.Contacts;
-import com.tanhua.commons.pojo.messages.MessageAnnouncement;
-import com.tanhua.commons.pojo.messages.MessageComment;
-import com.tanhua.commons.pojo.messages.Users;
+import com.tanhua.commons.pojo.messages.*;
 import com.tanhua.commons.pojo.moments.Comment;
 import com.tanhua.commons.pojo.sso.UserInfo;
 import com.tanhua.commons.service.huaxin.HuanXinService;
@@ -135,7 +132,7 @@ public class MessageServiceImpl implements MessageService {
         PageRequest pageRequest = PageRequest.of(startPage - 1, pageSize);
         Query query = Query.query(Criteria.where("publishUserId").is(userId)
                 .andOperator(Criteria.where("commentType").is(commentType)))
-                .with(pageRequest).with(Sort.by(Sort.Direction.DESC));
+                .with(pageRequest).with(Sort.by(Sort.Order.desc("created")));
         List<Comment> comments = mongoTemplate.find(query, Comment.class);
         // 获取评论人的ID集合
         List<Long> ids = new ArrayList<>();
@@ -177,18 +174,30 @@ public class MessageServiceImpl implements MessageService {
     @Override
     public MessageResult queryAnnouncement(String token, Integer startPage, Integer pageSize) {
         // 查询公告表数据，MyBatisPlus分页，需要配置拦截器，具体内容看笔记
-        QueryWrapper<MessageAnnouncement> queryWrapper = new QueryWrapper<>();
+        QueryWrapper queryWrapper = new QueryWrapper<>();
         queryWrapper.orderByDesc("created");
-        IPage<MessageAnnouncement> iPage = new Page<>(startPage, pageSize);
-        IPage<MessageAnnouncement> selectPage = announcementMapper.selectPage(iPage, queryWrapper);
-        List<MessageAnnouncement> announcements = selectPage.getRecords();
+        IPage<Announcement> iPage = new Page<>(startPage, pageSize);
+        IPage<Announcement> selectPage = announcementMapper.selectPage(iPage, queryWrapper);
+        List<Announcement> announcementPage = selectPage.getRecords();
+        List<MessageAnnouncement> messageAnnouncementList = new ArrayList<>();
+
+        for (Announcement record : announcementPage) {
+            MessageAnnouncement messageAnnouncement = new MessageAnnouncement();
+            messageAnnouncement.setId(record.getId().toString());
+            messageAnnouncement.setTitle(record.getTitle());
+            messageAnnouncement.setDescription(record.getDescription());
+            messageAnnouncement.setCreateDate(new DateTime(record.getCreated()).toString("yyyy-MM-dd HH:mm"));
+
+            messageAnnouncementList.add(messageAnnouncement);
+        }
+
         MessageResult messageResult = new MessageResult();
-        messageResult.setCounts(announcements.size());
+        messageResult.setCounts(messageAnnouncementList.size());
         messageResult.setPage(startPage);
         messageResult.setPagesize(pageSize);
         messageResult.setPage(0);
-        messageResult.setItems(announcements);
-        return null;
+        messageResult.setItems(messageAnnouncementList);
+        return messageResult;
     }
 
 
