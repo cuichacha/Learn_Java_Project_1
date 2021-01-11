@@ -12,4 +12,9 @@ public class RedisKey {
     public static final String SUBSCRIBE = "subscribe";
 
     public static final String HUANXIN = "huanxin_token";
+
+    public static final String PID_HASH = "pid_hash_key";
+    public static final String MOVEMENT_PID = "movement_pid_key";
+    public static final String VID_HASH = "vid_hash_key";
+    public static final String VIDEO_VID = "video_vid_key";
 }

@@ -11,6 +11,7 @@ public class Video implements Serializable {
     private static final long serialVersionUID = -3136732836884933873L;
 
     private ObjectId id; //主键id
+    private Long vid;
     private Long userId;
     private String text; //文字
     private String picUrl; //视频封面文件
@@ -26,8 +27,9 @@ public class Video implements Serializable {
     public Video() {
     }
 
-    public Video(ObjectId id, Long userId, String text, String picUrl, String videoUrl, Long created, Integer seeType, List<Long> seeList, List<Long> notSeeList, String longitude, String latitude, String locationName) {
+    public Video(ObjectId id, Long vid, Long userId, String text, String picUrl, String videoUrl, Long created, Integer seeType, List<Long> seeList, List<Long> notSeeList, String longitude, String latitude, String locationName) {
         this.id = id;
+        this.vid = vid;
         this.userId = userId;
         this.text = text;
         this.picUrl = picUrl;
@@ -51,6 +53,14 @@ public class Video implements Serializable {
 
     public void setId(ObjectId id) {
         this.id = id;
+    }
+
+    public Long getVid() {
+        return vid;
+    }
+
+    public void setVid(Long vid) {
+        this.vid = vid;
     }
 
     public Long getUserId() {
@@ -145,6 +155,7 @@ public class Video implements Serializable {
     public String toString() {
         return "Video{" +
                 "id=" + id +
+                ", vid=" + vid +
                 ", userId=" + userId +
                 ", text='" + text + '\'' +
                 ", picUrl='" + picUrl + '\'' +

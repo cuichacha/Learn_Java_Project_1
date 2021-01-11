@@ -152,6 +152,8 @@ public class VideoServiceImpl implements VideoService {
         video.setVideoUrl(fdfsWebServer.getWebServerUrl() + "/" + storePath.getFullPath());
         video.setCreated(System.currentTimeMillis());
         video.setSeeType(1);
+        Long vid = incrementVid(video.getId().toHexString());
+        video.setVid(vid);
         mongoTemplate.insert(video);
         return true;
     }
@@ -168,6 +170,25 @@ public class VideoServiceImpl implements VideoService {
         subscribeRedisKey = RedisKeyUtil.generateCacheRedisKey(userId) + "_" + RedisKey.SUBSCRIBE;
         redisTemplate.delete(subscribeRedisKey);
         return true;
+    }
+
+    @Override
+    public Long incrementVid(String videoId) {
+        String hashKey = RedisKey.VID_HASH;
+        Boolean hasKey = redisTemplate.opsForHash().hasKey(hashKey, videoId);
+        if (hasKey) {
+            Object increment = redisTemplate.opsForHash().get(hashKey, videoId);
+            if (increment != null) {
+                return Long.valueOf(increment.toString());
+            }
+        }
+        String redisKey = RedisKey.VIDEO_VID;
+        Long increment = redisTemplate.opsForValue().increment(redisKey);
+        if (increment!= null) {
+            redisTemplate.opsForHash().put(hashKey, videoId, increment.toString());
+            return increment;
+        }
+        return null;
     }
 
 

@@ -11,4 +11,6 @@ public interface VideoService {
     public abstract Boolean subscribe(String token, Long userId);
 
     public abstract Boolean unsubscribe(String token, Long userId);
+
+    public abstract Long incrementVid(String videoId);
 }

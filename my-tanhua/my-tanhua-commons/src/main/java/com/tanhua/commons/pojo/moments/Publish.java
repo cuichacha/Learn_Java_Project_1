@@ -11,6 +11,7 @@ public class Publish implements Serializable {
     private static final long serialVersionUID = 8732308321082804771L;
 
     private ObjectId id; //主键id
+    private Long pid; //Long类型的id，用于推荐引擎使用
     private Long userId;
     private String text; //文字
     private List<String> medias; //媒体数据，图片或小视频 url
@@ -25,8 +26,9 @@ public class Publish implements Serializable {
     public Publish() {
     }
 
-    public Publish(ObjectId id, Long userId, String text, List<String> medias, Integer seeType, List<Long> seeList, List<Long> notSeeList, String longitude, String latitude, String locationName, Long created) {
+    public Publish(ObjectId id, Long pid, Long userId, String text, List<String> medias, Integer seeType, List<Long> seeList, List<Long> notSeeList, String longitude, String latitude, String locationName, Long created) {
         this.id = id;
+        this.pid = pid;
         this.userId = userId;
         this.text = text;
         this.medias = medias;
@@ -49,6 +51,14 @@ public class Publish implements Serializable {
 
     public void setId(ObjectId id) {
         this.id = id;
+    }
+
+    public Long getPid() {
+        return pid;
+    }
+
+    public void setPid(Long pid) {
+        this.pid = pid;
     }
 
     public Long getUserId() {
@@ -135,6 +145,7 @@ public class Publish implements Serializable {
     public String toString() {
         return "Publish{" +
                 "id=" + id +
+                ", pid=" + pid +
                 ", userId=" + userId +
                 ", text='" + text + '\'' +
                 ", medias=" + medias +

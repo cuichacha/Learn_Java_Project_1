@@ -32,4 +32,6 @@ public interface MovementsService {
     public abstract void fillPublishToMovements(Movements movements, Publish publish, Long userId);
 
     public abstract void fillUserInfoToMovements(Movements movements, UserInfo userInfo);
+
+    public abstract Long incrementPid(String publishId);
 }

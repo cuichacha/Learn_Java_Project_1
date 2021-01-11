@@ -10,7 +10,6 @@ import com.tanhua.commons.utils.RelativeDateFormat;
 import com.tanhua.commons.utils.TokenUtil;
 import com.tanhua.commons.vo.moments.MovementsResult;
 import com.tanhua.moments.mapper.UserInfoMapper;
-import org.apache.rocketmq.common.message.Message;
 import org.apache.rocketmq.spring.core.RocketMQTemplate;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +23,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 
 @Service
 @com.alibaba.dubbo.config.annotation.Service
@@ -171,6 +169,8 @@ public class MovementsServiceImpl implements MovementsService {
         publish.setMedias(medias);
         publish.setId(ObjectId.get());
         publish.setCreated(System.currentTimeMillis());
+        Long pid = incrementPid(publish.getId().toHexString());
+        publish.setPid(pid);
         // 先向发布表中插入一条数据
         try {
             mongoTemplate.insert(publish);
@@ -283,7 +283,7 @@ public class MovementsServiceImpl implements MovementsService {
         if (commentType == 3) {
             decrement = redisTemplate.opsForValue().decrement(loveRedisKey);
         }
-        if (decrement < 0) {
+        if (decrement == null || decrement <= 0) {
             decrement = 0L;
         }
         // 开启一个新的线程，去进行MongoDB表的增加或者删除
@@ -412,6 +412,25 @@ public class MovementsServiceImpl implements MovementsService {
             movements.setNickname(userInfo.getNickName());
             movements.setTags(userInfo.getTags().split(","));
         }
+    }
+
+    @Override
+    public Long incrementPid(String publishId) {
+        String hashKey = RedisKey.PID_HASH;
+        Boolean hasKey = redisTemplate.opsForHash().hasKey(hashKey, publishId);
+        if (hasKey) {
+            Object increment = redisTemplate.opsForHash().get(hashKey, publishId);
+            if (increment != null) {
+                return Long.valueOf(increment.toString());
+            }
+        }
+        String redisKey = RedisKey.MOVEMENT_PID;
+        Long increment = redisTemplate.opsForValue().increment(redisKey);
+        if (increment!= null) {
+            redisTemplate.opsForHash().put(hashKey, publishId, increment.toString());
+            return increment;
+        }
+        return null;
     }
 
 
